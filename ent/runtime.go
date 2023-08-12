@@ -23,6 +23,10 @@ func init() {
 	gameDescType := gameFields[1].Descriptor()
 	// game.DefaultType holds the default value on creation for the type field.
 	game.DefaultType = gameDescType.Default.(string)
+	// gameDescOu is the schema descriptor for ou field.
+	gameDescOu := gameFields[2].Descriptor()
+	// game.DefaultOu holds the default value on creation for the ou field.
+	game.DefaultOu = gameDescOu.Default.(string)
 	lendingFields := schema.Lending{}.Fields()
 	_ = lendingFields
 	// lendingDescDate is the schema descriptor for date field.

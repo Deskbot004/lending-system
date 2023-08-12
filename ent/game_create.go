@@ -47,6 +47,20 @@ func (gc *GameCreate) SetNillableType(s *string) *GameCreate {
 	return gc
 }
 
+// SetOu sets the "ou" field.
+func (gc *GameCreate) SetOu(s string) *GameCreate {
+	gc.mutation.SetOu(s)
+	return gc
+}
+
+// SetNillableOu sets the "ou" field if the given value is not nil.
+func (gc *GameCreate) SetNillableOu(s *string) *GameCreate {
+	if s != nil {
+		gc.SetOu(*s)
+	}
+	return gc
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gc *GameCreate) Mutation() *GameMutation {
 	return gc.mutation
@@ -90,6 +104,10 @@ func (gc *GameCreate) defaults() {
 		v := game.DefaultType
 		gc.mutation.SetType(v)
 	}
+	if _, ok := gc.mutation.Ou(); !ok {
+		v := game.DefaultOu
+		gc.mutation.SetOu(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -99,6 +117,9 @@ func (gc *GameCreate) check() error {
 	}
 	if _, ok := gc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Game.type"`)}
+	}
+	if _, ok := gc.mutation.Ou(); !ok {
+		return &ValidationError{Name: "ou", err: errors.New(`ent: missing required field "Game.ou"`)}
 	}
 	return nil
 }
@@ -133,6 +154,10 @@ func (gc *GameCreate) createSpec() (*Game, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.GetType(); ok {
 		_spec.SetField(game.FieldType, field.TypeString, value)
 		_node.Type = value
+	}
+	if value, ok := gc.mutation.Ou(); ok {
+		_spec.SetField(game.FieldOu, field.TypeString, value)
+		_node.Ou = value
 	}
 	return _node, _spec
 }

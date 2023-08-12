@@ -38,6 +38,7 @@ type GameMutation struct {
 	id            *int
 	name          *string
 	_type         *string
+	ou            *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Game, error)
@@ -214,6 +215,42 @@ func (m *GameMutation) ResetType() {
 	m._type = nil
 }
 
+// SetOu sets the "ou" field.
+func (m *GameMutation) SetOu(s string) {
+	m.ou = &s
+}
+
+// Ou returns the value of the "ou" field in the mutation.
+func (m *GameMutation) Ou() (r string, exists bool) {
+	v := m.ou
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOu returns the old "ou" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldOu(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOu is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOu requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOu: %w", err)
+	}
+	return oldValue.Ou, nil
+}
+
+// ResetOu resets all changes to the "ou" field.
+func (m *GameMutation) ResetOu() {
+	m.ou = nil
+}
+
 // Where appends a list predicates to the GameMutation builder.
 func (m *GameMutation) Where(ps ...predicate.Game) {
 	m.predicates = append(m.predicates, ps...)
@@ -248,12 +285,15 @@ func (m *GameMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GameMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.name != nil {
 		fields = append(fields, game.FieldName)
 	}
 	if m._type != nil {
 		fields = append(fields, game.FieldType)
+	}
+	if m.ou != nil {
+		fields = append(fields, game.FieldOu)
 	}
 	return fields
 }
@@ -267,6 +307,8 @@ func (m *GameMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case game.FieldType:
 		return m.GetType()
+	case game.FieldOu:
+		return m.Ou()
 	}
 	return nil, false
 }
@@ -280,6 +322,8 @@ func (m *GameMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case game.FieldType:
 		return m.OldType(ctx)
+	case game.FieldOu:
+		return m.OldOu(ctx)
 	}
 	return nil, fmt.Errorf("unknown Game field %s", name)
 }
@@ -302,6 +346,13 @@ func (m *GameMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetType(v)
+		return nil
+	case game.FieldOu:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOu(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Game field %s", name)
@@ -357,6 +408,9 @@ func (m *GameMutation) ResetField(name string) error {
 		return nil
 	case game.FieldType:
 		m.ResetType()
+		return nil
+	case game.FieldOu:
+		m.ResetOu()
 		return nil
 	}
 	return fmt.Errorf("unknown Game field %s", name)

@@ -29,22 +29,24 @@ func StartServer(client *ent.Client) {
 
 	// Startpage _dashboard.html
 	router.GET("/index", func(c *gin.Context) {
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
 		c.HTML(http.StatusOK, "_dashboard.html", gin.H{
-			"Usernum": 10,
-			"Gamenum": 10,
+			"Usernum": len(users),
+			"Gamenum": len(games),
 			"Error":   errMess,
 		})
 	})
 
 	// Game overviews
 	router.GET("/game_overview", func(c *gin.Context) {
-		users, err := sql.GetAllUsers(context.Background(), client)
+		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
 			errMess = "Error happened"
-		}
-		games, err := sql.GetAllGames(context.Background(), client)
-		if err != nil {
-			errMess = "Error happened"
+			log.Println(err)
 		}
 		c.HTML(http.StatusOK, "_game_overview.html", gin.H{
 			"Users":   users,
@@ -74,9 +76,14 @@ func StartServer(client *ent.Client) {
 		})
 		*/
 		// if success
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
 		c.HTML(http.StatusOK, "_dashboard.html", gin.H{
-			"Usernum": 10,
-			"Gamenum": 10,
+			"Usernum": len(users),
+			"Gamenum": len(games),
 			"Error":   errMess,
 		})
 	})

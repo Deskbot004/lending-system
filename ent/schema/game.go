@@ -17,6 +17,8 @@ func (Game) Fields() []ent.Field {
 			Default("unknown"),
 		field.String("type").
 			Default("unknown"),
+		field.String("ou").
+			Default("unknown"),
 	}
 }
 

@@ -15,6 +15,8 @@ const (
 	FieldName = "name"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldOu holds the string denoting the ou field in the database.
+	FieldOu = "ou"
 	// Table holds the table name of the game in the database.
 	Table = "games"
 )
@@ -24,6 +26,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldType,
+	FieldOu,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -41,6 +44,8 @@ var (
 	DefaultName string
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType string
+	// DefaultOu holds the default value on creation for the "ou" field.
+	DefaultOu string
 )
 
 // OrderOption defines the ordering options for the Game queries.
@@ -59,4 +64,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// ByOu orders the results by the ou field.
+func ByOu(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOu, opts...).ToFunc()
 }

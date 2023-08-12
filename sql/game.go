@@ -12,6 +12,7 @@ func AddGame(ctx context.Context, client *ent.Client) (*ent.Game, error) {
 		Create().
 		SetName("Hi").
 		SetType("Nothing").
+		SetOu("Sean").
 		Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating game: %w", err)

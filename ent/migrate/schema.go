@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Default: "unknown"},
 		{Name: "type", Type: field.TypeString, Default: "unknown"},
+		{Name: "ou", Type: field.TypeString, Default: "unknown"},
 	}
 	// GamesTable holds the schema information for the "games" table.
 	GamesTable = &schema.Table{

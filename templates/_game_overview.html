@@ -25,19 +25,23 @@
               <div class="col-lg-8 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">All {{.Gamenum}} packages</h4>
-                    <p class="card-description"> Every package in every project
+                    <h4 class="card-title">Alle {{.Gamenum}} Spiele</h4>
+                    <p class="card-description"> Jedes Spiel von jedem Nutzer
                     </p>
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>Package</th>
+                          <th>Spielname</th>
+                          <th>Spieltyp</th>
+                          <th>Original Besitzer</th>
                         </tr>
                       </thead>
                       <tbody>
                         {{ range .Games}}
                         <tr style="transform: rotate(0);">
                           <td>{{ .Name}}</td>
+                          <td>{{ .Type}}</td>
+                          <td>{{ .Ou}}</td>
                         </tr>
                         {{ end}}
                       </tbody>

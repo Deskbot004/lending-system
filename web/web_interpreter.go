@@ -1,5 +1,12 @@
 package web
 
+import (
+	"context"
+	"fmt"
+	"lending-system/ent"
+	"lending-system/sql"
+)
+
 type Gameinfo struct {
 	Name     string
 	Type     string
@@ -8,7 +15,7 @@ type Gameinfo struct {
 	Note     string
 }
 
-func NewGameinfo() Gameinfo {
+func newGameinfo() Gameinfo {
 	info := Gameinfo{
 		Name:     "Test",
 		Type:     "Test4",
@@ -17,4 +24,16 @@ func NewGameinfo() Gameinfo {
 		Note:     "Test3",
 	}
 	return info
+}
+
+func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*ent.Game, error) {
+	users, err := sql.GetAllUsers(ctx, client)
+	if err != nil {
+		return nil, nil, fmt.Errorf("getting all users failed: %v", err)
+	}
+	games, err := sql.GetAllGames(ctx, client)
+	if err != nil {
+		return nil, nil, fmt.Errorf("getting all games failed: %v", err)
+	}
+	return users, games, err
 }

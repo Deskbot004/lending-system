@@ -55,6 +55,20 @@ func (gu *GameUpdate) SetNillableType(s *string) *GameUpdate {
 	return gu
 }
 
+// SetOu sets the "ou" field.
+func (gu *GameUpdate) SetOu(s string) *GameUpdate {
+	gu.mutation.SetOu(s)
+	return gu
+}
+
+// SetNillableOu sets the "ou" field if the given value is not nil.
+func (gu *GameUpdate) SetNillableOu(s *string) *GameUpdate {
+	if s != nil {
+		gu.SetOu(*s)
+	}
+	return gu
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gu *GameUpdate) Mutation() *GameMutation {
 	return gu.mutation
@@ -102,6 +116,9 @@ func (gu *GameUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := gu.mutation.GetType(); ok {
 		_spec.SetField(game.FieldType, field.TypeString, value)
 	}
+	if value, ok := gu.mutation.Ou(); ok {
+		_spec.SetField(game.FieldOu, field.TypeString, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{game.Label}
@@ -146,6 +163,20 @@ func (guo *GameUpdateOne) SetType(s string) *GameUpdateOne {
 func (guo *GameUpdateOne) SetNillableType(s *string) *GameUpdateOne {
 	if s != nil {
 		guo.SetType(*s)
+	}
+	return guo
+}
+
+// SetOu sets the "ou" field.
+func (guo *GameUpdateOne) SetOu(s string) *GameUpdateOne {
+	guo.mutation.SetOu(s)
+	return guo
+}
+
+// SetNillableOu sets the "ou" field if the given value is not nil.
+func (guo *GameUpdateOne) SetNillableOu(s *string) *GameUpdateOne {
+	if s != nil {
+		guo.SetOu(*s)
 	}
 	return guo
 }
@@ -226,6 +257,9 @@ func (guo *GameUpdateOne) sqlSave(ctx context.Context) (_node *Game, err error) 
 	}
 	if value, ok := guo.mutation.GetType(); ok {
 		_spec.SetField(game.FieldType, field.TypeString, value)
+	}
+	if value, ok := guo.mutation.Ou(); ok {
+		_spec.SetField(game.FieldOu, field.TypeString, value)
 	}
 	_node = &Game{config: guo.config}
 	_spec.Assign = _node.assignValues

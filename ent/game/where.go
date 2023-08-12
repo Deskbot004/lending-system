@@ -63,6 +63,11 @@ func Type(v string) predicate.Game {
 	return predicate.Game(sql.FieldEQ(FieldType, v))
 }
 
+// Ou applies equality check predicate on the "ou" field. It's identical to OuEQ.
+func Ou(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldOu, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Game {
 	return predicate.Game(sql.FieldEQ(FieldName, v))
@@ -191,6 +196,71 @@ func TypeEqualFold(v string) predicate.Game {
 // TypeContainsFold applies the ContainsFold predicate on the "type" field.
 func TypeContainsFold(v string) predicate.Game {
 	return predicate.Game(sql.FieldContainsFold(FieldType, v))
+}
+
+// OuEQ applies the EQ predicate on the "ou" field.
+func OuEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldOu, v))
+}
+
+// OuNEQ applies the NEQ predicate on the "ou" field.
+func OuNEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldNEQ(FieldOu, v))
+}
+
+// OuIn applies the In predicate on the "ou" field.
+func OuIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldIn(FieldOu, vs...))
+}
+
+// OuNotIn applies the NotIn predicate on the "ou" field.
+func OuNotIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldNotIn(FieldOu, vs...))
+}
+
+// OuGT applies the GT predicate on the "ou" field.
+func OuGT(v string) predicate.Game {
+	return predicate.Game(sql.FieldGT(FieldOu, v))
+}
+
+// OuGTE applies the GTE predicate on the "ou" field.
+func OuGTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldGTE(FieldOu, v))
+}
+
+// OuLT applies the LT predicate on the "ou" field.
+func OuLT(v string) predicate.Game {
+	return predicate.Game(sql.FieldLT(FieldOu, v))
+}
+
+// OuLTE applies the LTE predicate on the "ou" field.
+func OuLTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldLTE(FieldOu, v))
+}
+
+// OuContains applies the Contains predicate on the "ou" field.
+func OuContains(v string) predicate.Game {
+	return predicate.Game(sql.FieldContains(FieldOu, v))
+}
+
+// OuHasPrefix applies the HasPrefix predicate on the "ou" field.
+func OuHasPrefix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasPrefix(FieldOu, v))
+}
+
+// OuHasSuffix applies the HasSuffix predicate on the "ou" field.
+func OuHasSuffix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasSuffix(FieldOu, v))
+}
+
+// OuEqualFold applies the EqualFold predicate on the "ou" field.
+func OuEqualFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldEqualFold(FieldOu, v))
+}
+
+// OuContainsFold applies the ContainsFold predicate on the "ou" field.
+func OuContainsFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldContainsFold(FieldOu, v))
 }
 
 // And groups predicates with the AND operator between them.

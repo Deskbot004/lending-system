@@ -11,27 +11,27 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Add a project </h3>
+              <h3 class="page-title"> Neuer Nutzer </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Add project</li>
+                  <li class="breadcrumb-item active" aria-current="page">Neuer Nutzer</li>
                 </ol>
               </nav>
             </div>
             <div class="row">
                 <div class="card">
                   <div class="card-body">
-                      <h4 class="card-title"> Project form</h4>
-                      <p class="card-description"> Please enter the correct information given by Gitlab</p>
-                      <form class="forms-sample" action="/add" method="post">
+                      <h4 class="card-title"> Nutzer Formular</h4>
+                      <p class="card-description"> Bitte gebe deinen Namen ein</p>
+                      <form class="forms-sample" action="/addUser" method="post">
                       <div class="form-group">
-                          <label for="InputName">Name of the project</label>
-                          <input type="text" class="form-control" id="InputProjectName" name="name" placeholder="e.g. Jonas">
+                          <label for="InputName">Name des Nutzers</label>
+                          <input type="text" class="form-control" id="InputProjectName" name="name" placeholder="bspw. Jonas">
                       </div>
                       <p class="text-danger">{{ .Error}}</p>
-                      <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
-                      <a class="btn btn-light" href="/index">Cancel</a>
+                      <button type="submit" class="btn btn-gradient-primary me-2">Bestätigen</button>
+                      <a class="btn btn-light" href="/index">Abbrechen</a>
                       </form>
                   </div>
               </div>

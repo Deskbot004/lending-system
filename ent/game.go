@@ -19,7 +19,9 @@ type Game struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Type holds the value of the "type" field.
-	Type         string `json:"type,omitempty"`
+	Type string `json:"type,omitempty"`
+	// Ou holds the value of the "ou" field.
+	Ou           string `json:"ou,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -30,7 +32,7 @@ func (*Game) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case game.FieldID:
 			values[i] = new(sql.NullInt64)
-		case game.FieldName, game.FieldType:
+		case game.FieldName, game.FieldType, game.FieldOu:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -64,6 +66,12 @@ func (ga *Game) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				ga.Type = value.String
+			}
+		case game.FieldOu:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field ou", values[i])
+			} else if value.Valid {
+				ga.Ou = value.String
 			}
 		default:
 			ga.selectValues.Set(columns[i], values[i])
@@ -106,6 +114,9 @@ func (ga *Game) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(ga.Type)
+	builder.WriteString(", ")
+	builder.WriteString("ou=")
+	builder.WriteString(ga.Ou)
 	builder.WriteByte(')')
 	return builder.String()
 }
