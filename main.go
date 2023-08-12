@@ -54,7 +54,7 @@ func main() {
 	}
 	*/
 	web.StartServer(client)
-	// -> Create gameconfig / user config
+	// PW system
 	// TODO upload image for icon
 	// TODO download Db
 }

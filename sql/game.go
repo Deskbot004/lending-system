@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"lending-system/ent"
+	"lending-system/ent/game"
 	"log"
 )
 
@@ -33,4 +34,30 @@ func GetAllGames(ctx context.Context, client *ent.Client) ([]*ent.Game, error) {
 		return nil, fmt.Errorf("failed finding games: %w", err)
 	}
 	return games, nil
+}
+
+func UpdateGame(ctx context.Context, game *ent.Game, gamenew ent.Game) error {
+	_, err := game.Update().
+		SetName(gamenew.Name).
+		SetType(gamenew.Type).
+		SetCu(gamenew.Cu).
+		SetNotes(gamenew.Notes).
+		Save(ctx)
+	if err != nil {
+		return fmt.Errorf("failed updating user: %w", err)
+	}
+	return nil
+}
+
+func GetGameByID(ctx context.Context, client *ent.Client, ID int) (*ent.Game, error) {
+	u, err := client.Game.
+		Query().
+		Where(game.ID(ID)).
+		Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, nil
+	} else if err != nil {
+		return nil, fmt.Errorf("failed querying game: %w", err)
+	}
+	return u, nil
 }

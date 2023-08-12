@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{ template "header.html"}}
+  <body>
+    <div class="container-scroller">
+      {{ template "navbar.html"}}
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        {{ template "sidebar.html"}}
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> Bearbeite ein Spiel </h3>
+              <p class="text-danger">{{ .Error}}</p>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="/game_overview/{{.Username}}">{{.Username}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Spiel bearbeiten</li>
+                </ol>
+              </nav>
+            </div>
+            <form class="forms-sample" action="/game_overview/{{.Username}}/{{.Game.ID}}/edit" method="post">
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                      <h4 class="card-title">Informationen von {{ .Game.Name }}</h4>
+                      <p class="card-description"> Bitte gebe die gewünschten Daten ein</p>
+                      <div class="form-group">
+                          <label for="InputName">Name des Spiels</label>
+                          <input type="text" class="form-control" id="InputName" name="name" value="{{ .Game.Name }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="GameType">Spieltyp</label>
+                        <select id="GameType" class="form-control" name="gametype">
+                            <option {{if eq .Game.Type "Switch"}}selected{{end}}>Switch</option>
+                        </select>
+                      </div>
+                      <p>Original Besitzer: {{.Username}}</p>
+                      <div class="form-group">
+                        <label for="GameCu">Zurzeitiger Besitzer</label>
+                        <select id="GameCu" class="form-control" name="gamecu">
+                          {{ range .Users}}  
+                          <option {{if eq .Name $.Game.Cu }}selected{{end}}>{{ .Name }}</option>
+                          {{end}}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="InputNote">Notizen</label>
+                        <textarea class="form-control" id="InputNote" name="notes" rows="8">{{ .Game.Notes }}</textarea>
+                      </div>
+                      <p class="text-danger">{{ .Error}}</p>
+                      <button type="submit" class="btn btn-gradient-primary me-2" value="save" name="submit">Bestätigen</button>
+                      <a class="btn btn-light" href="/game_overview/{{.Username}}">Abbrechen</a>
+                      </form>
+                  </div>
+                </div>
+              </div>
+            </div></form>
+          <!-- content-wrapper ends -->
+          <!-- partial:/partials/_footer.html -->
+          {{ template "footer.html"}}
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/misc.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+  </body>
+</html>

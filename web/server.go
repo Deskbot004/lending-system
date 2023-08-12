@@ -6,6 +6,7 @@ import (
 	"lending-system/sql"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,7 +74,6 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		// change games to relevant games with Gameinfo
 		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
 			"Users":    users,
 			"Username": user.Name,
@@ -121,7 +121,6 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		// change games to relevant games with Gameinfo
 		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
 			"Users":    users,
 			"Username": user.Name,
@@ -131,8 +130,125 @@ func StartServer(client *ent.Client) {
 		})
 	})
 
+	// config views
+	router.GET("/game_overview/:name/edit", func(c *gin.Context) {
+		name := c.Param("name")
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.HTML(http.StatusOK, "_configUser.html", gin.H{
+			"User":  user,
+			"Error": errMess,
+		})
+	})
+
+	router.POST("/game_overview/:name/edit", func(c *gin.Context) {
+		name := c.Param("name")
+		newname := c.PostForm("name")
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+
+		usernew := ent.User{
+			Name: newname,
+		}
+		err = sql.UpdateUser(context.Background(), user, usernew)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, _, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		games, err := sql.GetUserGames(context.Background(), user)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
+			"Users":    users,
+			"Username": newname,
+			"Games":    games,
+			"Gamenum":  len(games),
+			"Error":    errMess,
+		})
+	})
+
+	router.GET("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
+		name := c.Param("name")
+		gameid := c.Param("gameid")
+		gameidInt, _ := strconv.Atoi(gameid)
+		game, err := sql.GetGameByID(context.Background(), client, gameidInt)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, _, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.HTML(http.StatusOK, "_configGame.html", gin.H{
+			"Username": name,
+			"Users":    users,
+			"Game":     game,
+			"Error":    errMess,
+		})
+	})
+
+	router.POST("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
+		name := c.Param("name")
+		gameid := c.Param("gameid")
+		gameidInt, _ := strconv.Atoi(gameid)
+		game, err := sql.GetGameByID(context.Background(), client, gameidInt)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		gamenew := ent.Game{
+			Name:  c.PostForm("name"),
+			Type:  c.PostForm("gametype"),
+			Cu:    c.PostForm("gamecu"),
+			Notes: c.PostForm("notes"),
+		}
+		err = sql.UpdateGame(context.Background(), game, gamenew)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, _, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		games, err := sql.GetUserGames(context.Background(), user)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
+			"Users":    users,
+			"Username": name,
+			"Games":    games,
+			"Gamenum":  len(games),
+			"Error":    errMess,
+		})
+	})
+
 	router.GET("/deleteUser/:name", func(c *gin.Context) {
-		//TODO delete all packages too
+		//TODO delete all Games too
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
