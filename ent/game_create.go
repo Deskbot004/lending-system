@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"lending-system/ent/game"
 
@@ -18,6 +19,34 @@ type GameCreate struct {
 	hooks    []Hook
 }
 
+// SetName sets the "name" field.
+func (gc *GameCreate) SetName(s string) *GameCreate {
+	gc.mutation.SetName(s)
+	return gc
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (gc *GameCreate) SetNillableName(s *string) *GameCreate {
+	if s != nil {
+		gc.SetName(*s)
+	}
+	return gc
+}
+
+// SetType sets the "type" field.
+func (gc *GameCreate) SetType(s string) *GameCreate {
+	gc.mutation.SetType(s)
+	return gc
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (gc *GameCreate) SetNillableType(s *string) *GameCreate {
+	if s != nil {
+		gc.SetType(*s)
+	}
+	return gc
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gc *GameCreate) Mutation() *GameMutation {
 	return gc.mutation
@@ -25,6 +54,7 @@ func (gc *GameCreate) Mutation() *GameMutation {
 
 // Save creates the Game in the database.
 func (gc *GameCreate) Save(ctx context.Context) (*Game, error) {
+	gc.defaults()
 	return withHooks(ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
@@ -50,8 +80,26 @@ func (gc *GameCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (gc *GameCreate) defaults() {
+	if _, ok := gc.mutation.Name(); !ok {
+		v := game.DefaultName
+		gc.mutation.SetName(v)
+	}
+	if _, ok := gc.mutation.GetType(); !ok {
+		v := game.DefaultType
+		gc.mutation.SetType(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (gc *GameCreate) check() error {
+	if _, ok := gc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Game.name"`)}
+	}
+	if _, ok := gc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Game.type"`)}
+	}
 	return nil
 }
 
@@ -78,6 +126,14 @@ func (gc *GameCreate) createSpec() (*Game, *sqlgraph.CreateSpec) {
 		_node = &Game{config: gc.config}
 		_spec = sqlgraph.NewCreateSpec(game.Table, sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt))
 	)
+	if value, ok := gc.mutation.Name(); ok {
+		_spec.SetField(game.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := gc.mutation.GetType(); ok {
+		_spec.SetField(game.FieldType, field.TypeString, value)
+		_node.Type = value
+	}
 	return _node, _spec
 }
 
@@ -95,6 +151,7 @@ func (gcb *GameCreateBulk) Save(ctx context.Context) ([]*Game, error) {
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*GameMutation)
 				if !ok {

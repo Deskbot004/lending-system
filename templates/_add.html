@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{ template "header.html"}}
+  <body>
+    <div class="container-scroller">
+      {{ template "navbar.html"}}
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        {{ template "sidebar.html"}}
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> Add a project </h3>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Add project</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+                <div class="card">
+                  <div class="card-body">
+                      <h4 class="card-title"> Project form</h4>
+                      <p class="card-description"> Please enter the correct information given by Gitlab</p>
+                      <form class="forms-sample" action="/add" method="post">
+                      <div class="form-group">
+                          <label for="InputName">Name of the project</label>
+                          <input type="text" class="form-control" id="InputProjectName" name="name" placeholder="e.g. Jonas">
+                      </div>
+                      <p class="text-danger">{{ .Error}}</p>
+                      <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
+                      <a class="btn btn-light" href="/index">Cancel</a>
+                      </form>
+                  </div>
+              </div>
+            </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:/partials/_footer.html -->
+          {{ template "footer.html"}}
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/misc.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+  </body>
+</html>

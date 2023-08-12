@@ -11,52 +11,33 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Package Versions</h3>
+              <h3 class="page-title"> Alle Spiele</h3>
               <p class="text-danger">{{ .Error}}</p>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Package versions</li>
+                  <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Alle Spiele</li>
                 </ol>
               </nav>
             </div>
             <div class="row">
-              {{ template "all_projects_table.html" .ProjectsOut}}
+              {{ template "all_user_table.html" .Users}}
               <div class="col-lg-8 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">All {{.Packagenum}} packages</h4>
+                    <h4 class="card-title">All {{.Gamenum}} packages</h4>
                     <p class="card-description"> Every package in every project
                     </p>
                     <table class="table table-hover">
                       <thead>
                         <tr>
                           <th>Package</th>
-                          <th>Latest Version</th>
-                          <th>Version constraints</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {{ range .Packages}}
+                        {{ range .Games}}
                         <tr style="transform: rotate(0);">
-                          <td>{{ .Name}}
-                            <br><br>
-                            <a style="color: #940091ad;
-                            text-decoration: none;" href="https://packagist.org/packages/{{.Name}}" target="_blank">
-                              <img style="width: 25px; height: 25px;" src="/assets/images/packagist.png"></img>
-                            </a>
-                            {{ if not (eq .Extensionkey "")}}
-                            &nbsp;&nbsp;
-                            <a href="https://extensions.typo3.org/extension/{{.Extensionkey}}" target="_blank">
-                              <img style="width: 25px; height: 25px;" src="/assets/images/typo3.png"></img>
-                            </a>
-                            {{end}}
-                          </td>
-                          <td>{{ .Version}}</td>
-                          <td><ul>
-                            <li>Php:&nbsp;{{ .Phpversion}}</li>
-                            <li>Typo3:&nbsp;{{ .Typo3version }}</li>
-                          </ul></td>
+                          <td>{{ .Name}}</td>
                         </tr>
                         {{ end}}
                       </tbody>

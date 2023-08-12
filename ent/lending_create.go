@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"lending-system/ent/lending"
 
@@ -18,6 +19,34 @@ type LendingCreate struct {
 	hooks    []Hook
 }
 
+// SetDate sets the "date" field.
+func (lc *LendingCreate) SetDate(s string) *LendingCreate {
+	lc.mutation.SetDate(s)
+	return lc
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (lc *LendingCreate) SetNillableDate(s *string) *LendingCreate {
+	if s != nil {
+		lc.SetDate(*s)
+	}
+	return lc
+}
+
+// SetNotes sets the "notes" field.
+func (lc *LendingCreate) SetNotes(s string) *LendingCreate {
+	lc.mutation.SetNotes(s)
+	return lc
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (lc *LendingCreate) SetNillableNotes(s *string) *LendingCreate {
+	if s != nil {
+		lc.SetNotes(*s)
+	}
+	return lc
+}
+
 // Mutation returns the LendingMutation object of the builder.
 func (lc *LendingCreate) Mutation() *LendingMutation {
 	return lc.mutation
@@ -25,6 +54,7 @@ func (lc *LendingCreate) Mutation() *LendingMutation {
 
 // Save creates the Lending in the database.
 func (lc *LendingCreate) Save(ctx context.Context) (*Lending, error) {
+	lc.defaults()
 	return withHooks(ctx, lc.sqlSave, lc.mutation, lc.hooks)
 }
 
@@ -50,8 +80,26 @@ func (lc *LendingCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (lc *LendingCreate) defaults() {
+	if _, ok := lc.mutation.Date(); !ok {
+		v := lending.DefaultDate
+		lc.mutation.SetDate(v)
+	}
+	if _, ok := lc.mutation.Notes(); !ok {
+		v := lending.DefaultNotes
+		lc.mutation.SetNotes(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (lc *LendingCreate) check() error {
+	if _, ok := lc.mutation.Date(); !ok {
+		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "Lending.date"`)}
+	}
+	if _, ok := lc.mutation.Notes(); !ok {
+		return &ValidationError{Name: "notes", err: errors.New(`ent: missing required field "Lending.notes"`)}
+	}
 	return nil
 }
 
@@ -78,6 +126,14 @@ func (lc *LendingCreate) createSpec() (*Lending, *sqlgraph.CreateSpec) {
 		_node = &Lending{config: lc.config}
 		_spec = sqlgraph.NewCreateSpec(lending.Table, sqlgraph.NewFieldSpec(lending.FieldID, field.TypeInt))
 	)
+	if value, ok := lc.mutation.Date(); ok {
+		_spec.SetField(lending.FieldDate, field.TypeString, value)
+		_node.Date = value
+	}
+	if value, ok := lc.mutation.Notes(); ok {
+		_spec.SetField(lending.FieldNotes, field.TypeString, value)
+		_node.Notes = value
+	}
 	return _node, _spec
 }
 
@@ -95,6 +151,7 @@ func (lcb *LendingCreateBulk) Save(ctx context.Context) ([]*Lending, error) {
 	for i := range lcb.builders {
 		func(i int, root context.Context) {
 			builder := lcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*LendingMutation)
 				if !ok {

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{ template "header.html"}}
+  <body>
+    <div class="container-scroller">
+      {{ template "navbar.html"}}
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        {{ template "sidebar.html"}}
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> Alle Spiele</h3>
+              <p class="text-danger">{{ .Error}}</p>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Alle Spiele</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+              {{ template "all_user_table.html" .Users}}
+              <div class="col-lg-8 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">All {{.Gamenum}} packages</h4>
+                    <p class="card-description"> Every package in every project
+                    </p>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Package</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {{ range .Games}}
+                        <tr style="transform: rotate(0);">
+                          <td>{{ .Name}}</td>
+                        </tr>
+                        {{ end}}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <!-- content-wrapper ends -->
+          <!-- partial:/partials/_footer.html -->
+          {{ template "footer.html"}}
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/misc.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+  </body>
+</html>

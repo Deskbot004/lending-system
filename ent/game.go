@@ -13,9 +13,13 @@ import (
 
 // Game is the model entity for the Game schema.
 type Game struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           int `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Type holds the value of the "type" field.
+	Type         string `json:"type,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -26,6 +30,8 @@ func (*Game) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case game.FieldID:
 			values[i] = new(sql.NullInt64)
+		case game.FieldName, game.FieldType:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -47,6 +53,18 @@ func (ga *Game) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ga.ID = int(value.Int64)
+		case game.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				ga.Name = value.String
+			}
+		case game.FieldType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				ga.Type = value.String
+			}
 		default:
 			ga.selectValues.Set(columns[i], values[i])
 		}
@@ -82,7 +100,12 @@ func (ga *Game) Unwrap() *Game {
 func (ga *Game) String() string {
 	var builder strings.Builder
 	builder.WriteString("Game(")
-	builder.WriteString(fmt.Sprintf("id=%v", ga.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", ga.ID))
+	builder.WriteString("name=")
+	builder.WriteString(ga.Name)
+	builder.WriteString(", ")
+	builder.WriteString("type=")
+	builder.WriteString(ga.Type)
 	builder.WriteByte(')')
 	return builder.String()
 }

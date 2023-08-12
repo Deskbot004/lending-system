@@ -27,6 +27,34 @@ func (lu *LendingUpdate) Where(ps ...predicate.Lending) *LendingUpdate {
 	return lu
 }
 
+// SetDate sets the "date" field.
+func (lu *LendingUpdate) SetDate(s string) *LendingUpdate {
+	lu.mutation.SetDate(s)
+	return lu
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (lu *LendingUpdate) SetNillableDate(s *string) *LendingUpdate {
+	if s != nil {
+		lu.SetDate(*s)
+	}
+	return lu
+}
+
+// SetNotes sets the "notes" field.
+func (lu *LendingUpdate) SetNotes(s string) *LendingUpdate {
+	lu.mutation.SetNotes(s)
+	return lu
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (lu *LendingUpdate) SetNillableNotes(s *string) *LendingUpdate {
+	if s != nil {
+		lu.SetNotes(*s)
+	}
+	return lu
+}
+
 // Mutation returns the LendingMutation object of the builder.
 func (lu *LendingUpdate) Mutation() *LendingMutation {
 	return lu.mutation
@@ -68,6 +96,12 @@ func (lu *LendingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := lu.mutation.Date(); ok {
+		_spec.SetField(lending.FieldDate, field.TypeString, value)
+	}
+	if value, ok := lu.mutation.Notes(); ok {
+		_spec.SetField(lending.FieldNotes, field.TypeString, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, lu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{lending.Label}
@@ -86,6 +120,34 @@ type LendingUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *LendingMutation
+}
+
+// SetDate sets the "date" field.
+func (luo *LendingUpdateOne) SetDate(s string) *LendingUpdateOne {
+	luo.mutation.SetDate(s)
+	return luo
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (luo *LendingUpdateOne) SetNillableDate(s *string) *LendingUpdateOne {
+	if s != nil {
+		luo.SetDate(*s)
+	}
+	return luo
+}
+
+// SetNotes sets the "notes" field.
+func (luo *LendingUpdateOne) SetNotes(s string) *LendingUpdateOne {
+	luo.mutation.SetNotes(s)
+	return luo
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (luo *LendingUpdateOne) SetNillableNotes(s *string) *LendingUpdateOne {
+	if s != nil {
+		luo.SetNotes(*s)
+	}
+	return luo
 }
 
 // Mutation returns the LendingMutation object of the builder.
@@ -158,6 +220,12 @@ func (luo *LendingUpdateOne) sqlSave(ctx context.Context) (_node *Lending, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := luo.mutation.Date(); ok {
+		_spec.SetField(lending.FieldDate, field.TypeString, value)
+	}
+	if value, ok := luo.mutation.Notes(); ok {
+		_spec.SetField(lending.FieldNotes, field.TypeString, value)
 	}
 	_node = &Lending{config: luo.config}
 	_spec.Assign = _node.assignValues

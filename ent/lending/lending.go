@@ -11,6 +11,10 @@ const (
 	Label = "lending"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldDate holds the string denoting the date field in the database.
+	FieldDate = "date"
+	// FieldNotes holds the string denoting the notes field in the database.
+	FieldNotes = "notes"
 	// Table holds the table name of the lending in the database.
 	Table = "lendings"
 )
@@ -18,6 +22,8 @@ const (
 // Columns holds all SQL columns for lending fields.
 var Columns = []string{
 	FieldID,
+	FieldDate,
+	FieldNotes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -30,10 +36,27 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultDate holds the default value on creation for the "date" field.
+	DefaultDate string
+	// DefaultNotes holds the default value on creation for the "notes" field.
+	DefaultNotes string
+)
+
 // OrderOption defines the ordering options for the Lending queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByDate orders the results by the date field.
+func ByDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDate, opts...).ToFunc()
+}
+
+// ByNotes orders the results by the notes field.
+func ByNotes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNotes, opts...).ToFunc()
 }

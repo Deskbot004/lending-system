@@ -27,6 +27,34 @@ func (gu *GameUpdate) Where(ps ...predicate.Game) *GameUpdate {
 	return gu
 }
 
+// SetName sets the "name" field.
+func (gu *GameUpdate) SetName(s string) *GameUpdate {
+	gu.mutation.SetName(s)
+	return gu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (gu *GameUpdate) SetNillableName(s *string) *GameUpdate {
+	if s != nil {
+		gu.SetName(*s)
+	}
+	return gu
+}
+
+// SetType sets the "type" field.
+func (gu *GameUpdate) SetType(s string) *GameUpdate {
+	gu.mutation.SetType(s)
+	return gu
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (gu *GameUpdate) SetNillableType(s *string) *GameUpdate {
+	if s != nil {
+		gu.SetType(*s)
+	}
+	return gu
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gu *GameUpdate) Mutation() *GameMutation {
 	return gu.mutation
@@ -68,6 +96,12 @@ func (gu *GameUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := gu.mutation.Name(); ok {
+		_spec.SetField(game.FieldName, field.TypeString, value)
+	}
+	if value, ok := gu.mutation.GetType(); ok {
+		_spec.SetField(game.FieldType, field.TypeString, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{game.Label}
@@ -86,6 +120,34 @@ type GameUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *GameMutation
+}
+
+// SetName sets the "name" field.
+func (guo *GameUpdateOne) SetName(s string) *GameUpdateOne {
+	guo.mutation.SetName(s)
+	return guo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (guo *GameUpdateOne) SetNillableName(s *string) *GameUpdateOne {
+	if s != nil {
+		guo.SetName(*s)
+	}
+	return guo
+}
+
+// SetType sets the "type" field.
+func (guo *GameUpdateOne) SetType(s string) *GameUpdateOne {
+	guo.mutation.SetType(s)
+	return guo
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (guo *GameUpdateOne) SetNillableType(s *string) *GameUpdateOne {
+	if s != nil {
+		guo.SetType(*s)
+	}
+	return guo
 }
 
 // Mutation returns the GameMutation object of the builder.
@@ -158,6 +220,12 @@ func (guo *GameUpdateOne) sqlSave(ctx context.Context) (_node *Game, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := guo.mutation.Name(); ok {
+		_spec.SetField(game.FieldName, field.TypeString, value)
+	}
+	if value, ok := guo.mutation.GetType(); ok {
+		_spec.SetField(game.FieldType, field.TypeString, value)
 	}
 	_node = &Game{config: guo.config}
 	_spec.Assign = _node.assignValues

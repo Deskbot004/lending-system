@@ -13,9 +13,13 @@ import (
 
 // Lending is the model entity for the Lending schema.
 type Lending struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           int `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
+	// Date holds the value of the "date" field.
+	Date string `json:"date,omitempty"`
+	// Notes holds the value of the "notes" field.
+	Notes        string `json:"notes,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -26,6 +30,8 @@ func (*Lending) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case lending.FieldID:
 			values[i] = new(sql.NullInt64)
+		case lending.FieldDate, lending.FieldNotes:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -47,6 +53,18 @@ func (l *Lending) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			l.ID = int(value.Int64)
+		case lending.FieldDate:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field date", values[i])
+			} else if value.Valid {
+				l.Date = value.String
+			}
+		case lending.FieldNotes:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field notes", values[i])
+			} else if value.Valid {
+				l.Notes = value.String
+			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
 		}
@@ -82,7 +100,12 @@ func (l *Lending) Unwrap() *Lending {
 func (l *Lending) String() string {
 	var builder strings.Builder
 	builder.WriteString("Lending(")
-	builder.WriteString(fmt.Sprintf("id=%v", l.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", l.ID))
+	builder.WriteString("date=")
+	builder.WriteString(l.Date)
+	builder.WriteString(", ")
+	builder.WriteString("notes=")
+	builder.WriteString(l.Notes)
 	builder.WriteByte(')')
 	return builder.String()
 }

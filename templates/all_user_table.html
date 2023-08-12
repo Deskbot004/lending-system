@@ -9,17 +9,12 @@
             <thead>
             <tr>
                 <th>Project</th>
-                <th>Php Version</th>
-                <th>Typo3 Version</th>
             </tr>
             </thead>
             <tbody>
-            {{ range .Projects}}
-            <tr style="transform: rotate(0); {{ if eq .Name $.Active }}background-color: #e1effc;{{end}}">
-                <th scope="row"><a class="stretched-link" href="/versions/project/{{.Gitid}}/{{.Name}}" style="color: #940091ad;
-                text-decoration: none;">{{ .Name}}</a></th>
-                <td>{{ .Phpversion}}</td>
-                <td>{{ .Typo3version}}</td>
+            {{ range $ }}
+            <tr>
+                <th>{{ .Name}}</th>
             </tr>
             {{ end}}
             </tbody>

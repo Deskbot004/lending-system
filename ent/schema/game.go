@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // Game holds the schema definition for the Game entity.
 type Game struct {
@@ -9,7 +12,12 @@ type Game struct {
 
 // Fields of the Game.
 func (Game) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("name").
+			Default("unknown"),
+		field.String("type").
+			Default("unknown"),
+	}
 }
 
 // Edges of the Game.

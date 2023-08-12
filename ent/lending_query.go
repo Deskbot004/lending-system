@@ -257,6 +257,18 @@ func (lq *LendingQuery) Clone() *LendingQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Date string `json:"date,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Lending.Query().
+//		GroupBy(lending.FieldDate).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (lq *LendingQuery) GroupBy(field string, fields ...string) *LendingGroupBy {
 	lq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &LendingGroupBy{build: lq}
@@ -268,6 +280,16 @@ func (lq *LendingQuery) GroupBy(field string, fields ...string) *LendingGroupBy 
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Date string `json:"date,omitempty"`
+//	}
+//
+//	client.Lending.Query().
+//		Select(lending.FieldDate).
+//		Scan(ctx, &v)
 func (lq *LendingQuery) Select(fields ...string) *LendingSelect {
 	lq.ctx.Fields = append(lq.ctx.Fields, fields...)
 	sbuild := &LendingSelect{LendingQuery: lq}

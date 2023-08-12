@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // Lending holds the schema definition for the Lending entity.
 type Lending struct {
@@ -9,7 +12,12 @@ type Lending struct {
 
 // Fields of the Lending.
 func (Lending) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("date").
+			Default("unknown"),
+		field.String("notes").
+			Default("unknown"),
+	}
 }
 
 // Edges of the Lending.

@@ -11,6 +11,8 @@ var (
 	// GamesColumns holds the columns for the "games" table.
 	GamesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Default: "unknown"},
+		{Name: "type", Type: field.TypeString, Default: "unknown"},
 	}
 	// GamesTable holds the schema information for the "games" table.
 	GamesTable = &schema.Table{
@@ -21,6 +23,8 @@ var (
 	// LendingsColumns holds the columns for the "lendings" table.
 	LendingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "date", Type: field.TypeString, Default: "unknown"},
+		{Name: "notes", Type: field.TypeString, Default: "unknown"},
 	}
 	// LendingsTable holds the schema information for the "lendings" table.
 	LendingsTable = &schema.Table{
@@ -31,6 +35,7 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Default: "unknown"},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

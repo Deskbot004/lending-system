@@ -11,6 +11,10 @@ const (
 	Label = "game"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
 	// Table holds the table name of the game in the database.
 	Table = "games"
 )
@@ -18,6 +22,8 @@ const (
 // Columns holds all SQL columns for game fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
+	FieldType,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -30,10 +36,27 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
+	// DefaultType holds the default value on creation for the "type" field.
+	DefaultType string
+)
+
 // OrderOption defines the ordering options for the Game queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByType orders the results by the type field.
+func ByType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldType, opts...).ToFunc()
 }

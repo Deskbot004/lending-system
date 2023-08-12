@@ -257,6 +257,18 @@ func (gq *GameQuery) Clone() *GameQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Game.Query().
+//		GroupBy(game.FieldName).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (gq *GameQuery) GroupBy(field string, fields ...string) *GameGroupBy {
 	gq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &GameGroupBy{build: gq}
@@ -268,6 +280,16 @@ func (gq *GameQuery) GroupBy(field string, fields ...string) *GameGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//	}
+//
+//	client.Game.Query().
+//		Select(game.FieldName).
+//		Scan(ctx, &v)
 func (gq *GameQuery) Select(fields ...string) *GameSelect {
 	gq.ctx.Fields = append(gq.ctx.Fields, fields...)
 	sbuild := &GameSelect{GameQuery: gq}
