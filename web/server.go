@@ -51,7 +51,78 @@ func StartServer(client *ent.Client) {
 		c.HTML(http.StatusOK, "_game_overview.html", gin.H{
 			"Users":   users,
 			"Games":   games,
-			"Gamenum": 10,
+			"Gamenum": len(games),
+			"Error":   errMess,
+		})
+	})
+
+	router.GET("/game_overview/:name", func(c *gin.Context) {
+		name := c.Param("name")
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		// change games to relevant games with Gameinfo
+		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
+			"Users":    users,
+			"Username": user.Name,
+			"Games":    games,
+			"Gamenum":  len(games),
+			"Error":    errMess,
+		})
+	})
+
+	router.GET("/game_overview/:name/addGame", func(c *gin.Context) {
+		name := c.Param("name")
+		//TODO
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		// change games to relevant games with Gameinfo
+		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
+			"Users":    users,
+			"Username": user.Name,
+			"Games":    games,
+			"Gamenum":  len(games),
+			"Error":    errMess,
+		})
+	})
+
+	router.GET("/deleteUser/:name", func(c *gin.Context) {
+		//TODO delete all packages too
+		name := c.Param("name")
+		user, err := sql.GetUserByName(context.Background(), client, name)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		err = sql.DeleteUser(context.Background(), client, user)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.HTML(http.StatusOK, "_game_overview.html", gin.H{
+			"Users":   users,
+			"Games":   games,
+			"Gamenum": len(games),
 			"Error":   errMess,
 		})
 	})
@@ -59,7 +130,7 @@ func StartServer(client *ent.Client) {
 	// Adding Users
 	router.GET("/addUser", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "_add.html", gin.H{
-			"Error":   errMess,
+			"Error": errMess,
 		})
 	})
 
@@ -71,9 +142,9 @@ func StartServer(client *ent.Client) {
 		sql.AddUser(context.Background(), client, user)
 		// if fail
 		/*
-		c.HTML(http.StatusOK, "_add.html", gin.H{
-			"Error":   errMess,
-		})
+			c.HTML(http.StatusOK, "_add.html", gin.H{
+				"Error":   errMess,
+			})
 		*/
 		// if success
 		users, games, err := getGamesAndUsers(context.Background(), client)

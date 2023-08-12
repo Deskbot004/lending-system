@@ -33,11 +33,6 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// DefaultName holds the default value on creation for the "name" field.
-	DefaultName string
-)
-
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
 

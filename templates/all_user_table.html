@@ -13,8 +13,9 @@
             </thead>
             <tbody>
             {{ range $ }}
-            <tr>
-                <th>{{ .Name}}</th>
+            <tr style="transform: rotate(0);">
+                <th scope="row"><a class="stretched-link" href="/game_overview/{{.Name}}" style="color: #940091ad;
+                text-decoration: none;">{{ .Name}}</a></th>
             </tr>
             {{ end}}
             </tbody>

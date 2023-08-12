@@ -11,12 +11,16 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Alle Spiele</h3>
+              <h3 class="page-title">{{ .Username }} &nbsp;&nbsp;
+                <a href="/deleteUser/{{.Username}}" class="btn btn-gradient-danger btn-rounded btn-fw btn-sm">
+                  <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Nutzer löschen
+                </a>
+              </h3>
               <p class="text-danger">{{ .Error}}</p>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Alle Spiele</li>
+                  <li class="breadcrumb-item active" aria-current="page">{{.Username}}</li>
                 </ol>
               </nav>
             </div>
@@ -25,19 +29,34 @@
               <div class="col-lg-8 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">All {{.Gamenum}} packages</h4>
-                    <p class="card-description"> Every package in every project
+                    <h4 class="card-title">Alle Spiele von {{.Username}}&nbsp;&nbsp;
+                      <a href="/game_overview/{{.Username}}/addGame" class="btn btn-gradient-success btn-rounded btn-fw btn-sm">
+                        <i class="mdi mdi-library-plus"></i>&nbsp;&nbsp;Neues Spiel
+                      </a>
+                    </h4>
+                    <p class="card-description"> Jedes Spiel, dass der Nutzer besitzt
                     </p>
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>Package</th>
+                          <th>Name</th>
+                          <th>Typ</th>
+                          <th>Besitzer</th>
+                          <th>Notiz</th>
+                          <th>Bearbeiten</th>
                         </tr>
                       </thead>
                       <tbody>
                         {{ range .Games}}
                         <tr style="transform: rotate(0);">
                           <td>{{ .Name}}</td>
+                          <td>{{ .Type}}</td>
+                          <td><ul>
+                            <li>{{ .Name}}</li>
+                            <li>{{ .Name}}</li>
+                          </ul></td>
+                          <td>{{ .Type}}</td>
+                          <td>{{ .Type}}</td>
                         </tr>
                         {{ end}}
                       </tbody>
