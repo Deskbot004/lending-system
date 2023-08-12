@@ -14,24 +14,14 @@ var (
 		{Name: "name", Type: field.TypeString, Default: "unknown"},
 		{Name: "type", Type: field.TypeString, Default: "unknown"},
 		{Name: "ou", Type: field.TypeString, Default: "unknown"},
+		{Name: "cu", Type: field.TypeString, Default: "unknown"},
+		{Name: "notes", Type: field.TypeString, Default: "unknown"},
 	}
 	// GamesTable holds the schema information for the "games" table.
 	GamesTable = &schema.Table{
 		Name:       "games",
 		Columns:    GamesColumns,
 		PrimaryKey: []*schema.Column{GamesColumns[0]},
-	}
-	// LendingsColumns holds the columns for the "lendings" table.
-	LendingsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "date", Type: field.TypeString, Default: "unknown"},
-		{Name: "notes", Type: field.TypeString, Default: "unknown"},
-	}
-	// LendingsTable holds the schema information for the "lendings" table.
-	LendingsTable = &schema.Table{
-		Name:       "lendings",
-		Columns:    LendingsColumns,
-		PrimaryKey: []*schema.Column{LendingsColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -44,13 +34,40 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserGamesColumns holds the columns for the "user_games" table.
+	UserGamesColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "game_id", Type: field.TypeInt},
+	}
+	// UserGamesTable holds the schema information for the "user_games" table.
+	UserGamesTable = &schema.Table{
+		Name:       "user_games",
+		Columns:    UserGamesColumns,
+		PrimaryKey: []*schema.Column{UserGamesColumns[0], UserGamesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_games_user_id",
+				Columns:    []*schema.Column{UserGamesColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_games_game_id",
+				Columns:    []*schema.Column{UserGamesColumns[1]},
+				RefColumns: []*schema.Column{GamesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		GamesTable,
-		LendingsTable,
 		UsersTable,
+		UserGamesTable,
 	}
 )
 
 func init() {
+	UserGamesTable.ForeignKeys[0].RefTable = UsersTable
+	UserGamesTable.ForeignKeys[1].RefTable = GamesTable
 }

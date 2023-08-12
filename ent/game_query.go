@@ -4,9 +4,11 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"lending-system/ent/game"
 	"lending-system/ent/predicate"
+	"lending-system/ent/user"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
@@ -21,6 +23,7 @@ type GameQuery struct {
 	order      []game.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Game
+	withUser   *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (gq *GameQuery) Unique(unique bool) *GameQuery {
 func (gq *GameQuery) Order(o ...game.OrderOption) *GameQuery {
 	gq.order = append(gq.order, o...)
 	return gq
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (gq *GameQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: gq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := gq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := gq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(game.Table, game.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, game.UserTable, game.UserPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Game entity from the query.
@@ -249,10 +274,22 @@ func (gq *GameQuery) Clone() *GameQuery {
 		order:      append([]game.OrderOption{}, gq.order...),
 		inters:     append([]Interceptor{}, gq.inters...),
 		predicates: append([]predicate.Game{}, gq.predicates...),
+		withUser:   gq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  gq.sql.Clone(),
 		path: gq.path,
 	}
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (gq *GameQuery) WithUser(opts ...func(*UserQuery)) *GameQuery {
+	query := (&UserClient{config: gq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	gq.withUser = query
+	return gq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +368,11 @@ func (gq *GameQuery) prepareQuery(ctx context.Context) error {
 
 func (gq *GameQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Game, error) {
 	var (
-		nodes = []*Game{}
-		_spec = gq.querySpec()
+		nodes       = []*Game{}
+		_spec       = gq.querySpec()
+		loadedTypes = [1]bool{
+			gq.withUser != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Game).scanValues(nil, columns)
@@ -340,6 +380,7 @@ func (gq *GameQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Game, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Game{config: gq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +392,76 @@ func (gq *GameQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Game, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := gq.withUser; query != nil {
+		if err := gq.loadUser(ctx, query, nodes,
+			func(n *Game) { n.Edges.User = []*User{} },
+			func(n *Game, e *User) { n.Edges.User = append(n.Edges.User, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (gq *GameQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Game, init func(*Game), assign func(*Game, *User)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Game)
+	nids := make(map[int]map[*Game]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(game.UserTable)
+		s.Join(joinT).On(s.C(user.FieldID), joinT.C(game.UserPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(game.UserPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(game.UserPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Game]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*User](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "user" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (gq *GameQuery) sqlCount(ctx context.Context) (int, error) {

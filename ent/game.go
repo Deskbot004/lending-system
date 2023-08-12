@@ -21,8 +21,33 @@ type Game struct {
 	// Type holds the value of the "type" field.
 	Type string `json:"type,omitempty"`
 	// Ou holds the value of the "ou" field.
-	Ou           string `json:"ou,omitempty"`
+	Ou string `json:"ou,omitempty"`
+	// Cu holds the value of the "cu" field.
+	Cu string `json:"cu,omitempty"`
+	// Notes holds the value of the "notes" field.
+	Notes string `json:"notes,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the GameQuery when eager-loading is set.
+	Edges        GameEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// GameEdges holds the relations/edges for other nodes in the graph.
+type GameEdges struct {
+	// User holds the value of the user edge.
+	User []*User `json:"user,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading.
+func (e GameEdges) UserOrErr() ([]*User, error) {
+	if e.loadedTypes[0] {
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -32,7 +57,7 @@ func (*Game) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case game.FieldID:
 			values[i] = new(sql.NullInt64)
-		case game.FieldName, game.FieldType, game.FieldOu:
+		case game.FieldName, game.FieldType, game.FieldOu, game.FieldCu, game.FieldNotes:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -73,6 +98,18 @@ func (ga *Game) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ga.Ou = value.String
 			}
+		case game.FieldCu:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field cu", values[i])
+			} else if value.Valid {
+				ga.Cu = value.String
+			}
+		case game.FieldNotes:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field notes", values[i])
+			} else if value.Valid {
+				ga.Notes = value.String
+			}
 		default:
 			ga.selectValues.Set(columns[i], values[i])
 		}
@@ -84,6 +121,11 @@ func (ga *Game) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (ga *Game) Value(name string) (ent.Value, error) {
 	return ga.selectValues.Get(name)
+}
+
+// QueryUser queries the "user" edge of the Game entity.
+func (ga *Game) QueryUser() *UserQuery {
+	return NewGameClient(ga.config).QueryUser(ga)
 }
 
 // Update returns a builder for updating this Game.
@@ -117,6 +159,12 @@ func (ga *Game) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("ou=")
 	builder.WriteString(ga.Ou)
+	builder.WriteString(", ")
+	builder.WriteString("cu=")
+	builder.WriteString(ga.Cu)
+	builder.WriteString(", ")
+	builder.WriteString("notes=")
+	builder.WriteString(ga.Notes)
 	builder.WriteByte(')')
 	return builder.String()
 }

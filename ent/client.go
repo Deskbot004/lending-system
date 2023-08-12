@@ -11,12 +11,12 @@ import (
 	"lending-system/ent/migrate"
 
 	"lending-system/ent/game"
-	"lending-system/ent/lending"
 	"lending-system/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -26,8 +26,6 @@ type Client struct {
 	Schema *migrate.Schema
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
-	// Lending is the client for interacting with the Lending builders.
-	Lending *LendingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -44,7 +42,6 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Game = NewGameClient(c.config)
-	c.Lending = NewLendingClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -126,11 +123,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Game:    NewGameClient(cfg),
-		Lending: NewLendingClient(cfg),
-		User:    NewUserClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Game:   NewGameClient(cfg),
+		User:   NewUserClient(cfg),
 	}, nil
 }
 
@@ -148,11 +144,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Game:    NewGameClient(cfg),
-		Lending: NewLendingClient(cfg),
-		User:    NewUserClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Game:   NewGameClient(cfg),
+		User:   NewUserClient(cfg),
 	}, nil
 }
 
@@ -182,7 +177,6 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Game.Use(hooks...)
-	c.Lending.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -190,7 +184,6 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Game.Intercept(interceptors...)
-	c.Lending.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -199,8 +192,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *GameMutation:
 		return c.Game.mutate(ctx, m)
-	case *LendingMutation:
-		return c.Lending.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -301,6 +292,22 @@ func (c *GameClient) GetX(ctx context.Context, id int) *Game {
 	return obj
 }
 
+// QueryUser queries the user edge of a Game.
+func (c *GameClient) QueryUser(ga *Game) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ga.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(game.Table, game.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, game.UserTable, game.UserPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ga.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *GameClient) Hooks() []Hook {
 	return c.hooks.Game
@@ -323,124 +330,6 @@ func (c *GameClient) mutate(ctx context.Context, m *GameMutation) (Value, error)
 		return (&GameDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Game mutation op: %q", m.Op())
-	}
-}
-
-// LendingClient is a client for the Lending schema.
-type LendingClient struct {
-	config
-}
-
-// NewLendingClient returns a client for the Lending from the given config.
-func NewLendingClient(c config) *LendingClient {
-	return &LendingClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `lending.Hooks(f(g(h())))`.
-func (c *LendingClient) Use(hooks ...Hook) {
-	c.hooks.Lending = append(c.hooks.Lending, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `lending.Intercept(f(g(h())))`.
-func (c *LendingClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Lending = append(c.inters.Lending, interceptors...)
-}
-
-// Create returns a builder for creating a Lending entity.
-func (c *LendingClient) Create() *LendingCreate {
-	mutation := newLendingMutation(c.config, OpCreate)
-	return &LendingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Lending entities.
-func (c *LendingClient) CreateBulk(builders ...*LendingCreate) *LendingCreateBulk {
-	return &LendingCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Lending.
-func (c *LendingClient) Update() *LendingUpdate {
-	mutation := newLendingMutation(c.config, OpUpdate)
-	return &LendingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *LendingClient) UpdateOne(l *Lending) *LendingUpdateOne {
-	mutation := newLendingMutation(c.config, OpUpdateOne, withLending(l))
-	return &LendingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *LendingClient) UpdateOneID(id int) *LendingUpdateOne {
-	mutation := newLendingMutation(c.config, OpUpdateOne, withLendingID(id))
-	return &LendingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Lending.
-func (c *LendingClient) Delete() *LendingDelete {
-	mutation := newLendingMutation(c.config, OpDelete)
-	return &LendingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *LendingClient) DeleteOne(l *Lending) *LendingDeleteOne {
-	return c.DeleteOneID(l.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *LendingClient) DeleteOneID(id int) *LendingDeleteOne {
-	builder := c.Delete().Where(lending.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &LendingDeleteOne{builder}
-}
-
-// Query returns a query builder for Lending.
-func (c *LendingClient) Query() *LendingQuery {
-	return &LendingQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeLending},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Lending entity by its id.
-func (c *LendingClient) Get(ctx context.Context, id int) (*Lending, error) {
-	return c.Query().Where(lending.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *LendingClient) GetX(ctx context.Context, id int) *Lending {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *LendingClient) Hooks() []Hook {
-	return c.hooks.Lending
-}
-
-// Interceptors returns the client interceptors.
-func (c *LendingClient) Interceptors() []Interceptor {
-	return c.inters.Lending
-}
-
-func (c *LendingClient) mutate(ctx context.Context, m *LendingMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&LendingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&LendingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&LendingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&LendingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Lending mutation op: %q", m.Op())
 	}
 }
 
@@ -537,6 +426,22 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QueryGames queries the games edge of a User.
+func (c *UserClient) QueryGames(u *User) *GameQuery {
+	query := (&GameClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(game.Table, game.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, user.GamesTable, user.GamesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -565,9 +470,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Game, Lending, User []ent.Hook
+		Game, User []ent.Hook
 	}
 	inters struct {
-		Game, Lending, User []ent.Interceptor
+		Game, User []ent.Interceptor
 	}
 )

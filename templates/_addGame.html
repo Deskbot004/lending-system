@@ -11,32 +11,34 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title"> Add a project </h3>
+              <h3 class="page-title"> Neues Spiel für {{.Username}} </h3>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Add project</li>
+                  <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="/game_overview/{{.Username}}">{{.Username}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Neues Spiel</li>
                 </ol>
               </nav>
             </div>
             <div class="row">
                 <div class="card">
                   <div class="card-body">
-                      <h4 class="card-title"> Project form</h4>
-                      <p class="card-description"> Please enter the correct information given by Gitlab</p>
-                      <form class="forms-sample" action="/add" method="post">
+                      <h4 class="card-title"> Spiel Formular</h4>
+                      <p class="card-description"> Bitte gebe die Daten ein</p>
+                      <form class="forms-sample" action="/game_overview/{{.Username}}/addGame" method="post">
                       <div class="form-group">
-                          <label for="InputProjectName">Name of the project</label>
-                          <input type="text" class="form-control" id="InputProjectName" name="name" placeholder="e.g. bwegt">
+                          <label for="InputName">Name des Spiels</label>
+                          <input type="text" class="form-control" id="InputName" name="name" placeholder="bspw. JonasShooter69">
                       </div>
                       <div class="form-group">
-                          <label for="InputGitID">Git ID</label>
-                          <input type="number" class="form-control" id="InputGitID" name="id" placeholder="e.g. 198">
+                        <label for="GameType">Deployment</label>
+                        <select id="GameType" class="form-control" name="gametype">
+                            <option {{if eq .Type "Switch"}}selected{{end}}>Switch</option>
+                        </select>
                       </div>
                       <p class="text-danger">{{ .Error}}</p>
-                      <p class="text-success">{{ .Worry}}</p>
-                      <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
-                      <a class="btn btn-light" href="/">Cancel</a>
+                      <button type="submit" class="btn btn-gradient-primary me-2">Bestätigen</button>
+                      <a class="btn btn-light" href="/game_overview/{{.Username}}">Abbrechen</a>
                       </form>
                   </div>
               </div>

@@ -4,6 +4,7 @@ package game
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,19 @@ const (
 	FieldType = "type"
 	// FieldOu holds the string denoting the ou field in the database.
 	FieldOu = "ou"
+	// FieldCu holds the string denoting the cu field in the database.
+	FieldCu = "cu"
+	// FieldNotes holds the string denoting the notes field in the database.
+	FieldNotes = "notes"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the game in the database.
 	Table = "games"
+	// UserTable is the table that holds the user relation/edge. The primary key declared below.
+	UserTable = "user_games"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
 )
 
 // Columns holds all SQL columns for game fields.
@@ -27,7 +39,15 @@ var Columns = []string{
 	FieldName,
 	FieldType,
 	FieldOu,
+	FieldCu,
+	FieldNotes,
 }
+
+var (
+	// UserPrimaryKey and UserColumn2 are the table columns denoting the
+	// primary key for the user relation (M2M).
+	UserPrimaryKey = []string{"user_id", "game_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -46,6 +66,10 @@ var (
 	DefaultType string
 	// DefaultOu holds the default value on creation for the "ou" field.
 	DefaultOu string
+	// DefaultCu holds the default value on creation for the "cu" field.
+	DefaultCu string
+	// DefaultNotes holds the default value on creation for the "notes" field.
+	DefaultNotes string
 )
 
 // OrderOption defines the ordering options for the Game queries.
@@ -69,4 +93,35 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 // ByOu orders the results by the ou field.
 func ByOu(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOu, opts...).ToFunc()
+}
+
+// ByCu orders the results by the cu field.
+func ByCu(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCu, opts...).ToFunc()
+}
+
+// ByNotes orders the results by the notes field.
+func ByNotes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNotes, opts...).ToFunc()
+}
+
+// ByUserCount orders the results by user count.
+func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserStep(), opts...)
+	}
+}
+
+// ByUser orders the results by user terms.
+func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
+	)
 }

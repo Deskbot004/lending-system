@@ -50,3 +50,21 @@ func DeleteUser(ctx context.Context, client *ent.Client, user *ent.User) error {
 	}
 	return nil
 }
+
+func AddGameToUser(ctx context.Context, user *ent.User, game *ent.Game) error {
+	_, err := user.Update().
+		AddGames(game).
+		Save(ctx)
+	if err != nil {
+		return fmt.Errorf("failed adding edge to user:  %w", err)
+	}
+	return nil
+}
+
+func GetUserGames(ctx context.Context, user *ent.User) ([]*ent.Game, error) {
+	games, err := user.QueryGames().All(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying user games: %w", err)
+	}
+	return games, nil
+}

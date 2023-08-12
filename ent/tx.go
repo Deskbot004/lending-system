@@ -14,8 +14,6 @@ type Tx struct {
 	config
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
-	// Lending is the client for interacting with the Lending builders.
-	Lending *LendingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -150,7 +148,6 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Game = NewGameClient(tx.config)
-	tx.Lending = NewLendingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

@@ -4,7 +4,6 @@ package ent
 
 import (
 	"lending-system/ent/game"
-	"lending-system/ent/lending"
 	"lending-system/ent/schema"
 )
 
@@ -26,14 +25,12 @@ func init() {
 	gameDescOu := gameFields[2].Descriptor()
 	// game.DefaultOu holds the default value on creation for the ou field.
 	game.DefaultOu = gameDescOu.Default.(string)
-	lendingFields := schema.Lending{}.Fields()
-	_ = lendingFields
-	// lendingDescDate is the schema descriptor for date field.
-	lendingDescDate := lendingFields[0].Descriptor()
-	// lending.DefaultDate holds the default value on creation for the date field.
-	lending.DefaultDate = lendingDescDate.Default.(string)
-	// lendingDescNotes is the schema descriptor for notes field.
-	lendingDescNotes := lendingFields[1].Descriptor()
-	// lending.DefaultNotes holds the default value on creation for the notes field.
-	lending.DefaultNotes = lendingDescNotes.Default.(string)
+	// gameDescCu is the schema descriptor for cu field.
+	gameDescCu := gameFields[3].Descriptor()
+	// game.DefaultCu holds the default value on creation for the cu field.
+	game.DefaultCu = gameDescCu.Default.(string)
+	// gameDescNotes is the schema descriptor for notes field.
+	gameDescNotes := gameFields[4].Descriptor()
+	// game.DefaultNotes holds the default value on creation for the notes field.
+	game.DefaultNotes = gameDescNotes.Default.(string)
 }

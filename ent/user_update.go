@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"lending-system/ent/game"
 	"lending-system/ent/predicate"
 	"lending-system/ent/user"
 
@@ -33,9 +34,45 @@ func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	return uu
 }
 
+// AddGameIDs adds the "games" edge to the Game entity by IDs.
+func (uu *UserUpdate) AddGameIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddGameIDs(ids...)
+	return uu
+}
+
+// AddGames adds the "games" edges to the Game entity.
+func (uu *UserUpdate) AddGames(g ...*Game) *UserUpdate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uu.AddGameIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearGames clears all "games" edges to the Game entity.
+func (uu *UserUpdate) ClearGames() *UserUpdate {
+	uu.mutation.ClearGames()
+	return uu
+}
+
+// RemoveGameIDs removes the "games" edge to Game entities by IDs.
+func (uu *UserUpdate) RemoveGameIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveGameIDs(ids...)
+	return uu
+}
+
+// RemoveGames removes "games" edges to Game entities.
+func (uu *UserUpdate) RemoveGames(g ...*Game) *UserUpdate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uu.RemoveGameIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -77,6 +114,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 	}
+	if uu.mutation.GamesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedGamesIDs(); len(nodes) > 0 && !uu.mutation.GamesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.GamesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -103,9 +185,45 @@ func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	return uuo
 }
 
+// AddGameIDs adds the "games" edge to the Game entity by IDs.
+func (uuo *UserUpdateOne) AddGameIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddGameIDs(ids...)
+	return uuo
+}
+
+// AddGames adds the "games" edges to the Game entity.
+func (uuo *UserUpdateOne) AddGames(g ...*Game) *UserUpdateOne {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uuo.AddGameIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearGames clears all "games" edges to the Game entity.
+func (uuo *UserUpdateOne) ClearGames() *UserUpdateOne {
+	uuo.mutation.ClearGames()
+	return uuo
+}
+
+// RemoveGameIDs removes the "games" edge to Game entities by IDs.
+func (uuo *UserUpdateOne) RemoveGameIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveGameIDs(ids...)
+	return uuo
+}
+
+// RemoveGames removes "games" edges to Game entities.
+func (uuo *UserUpdateOne) RemoveGames(g ...*Game) *UserUpdateOne {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uuo.RemoveGameIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -176,6 +294,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
+	}
+	if uuo.mutation.GamesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedGamesIDs(); len(nodes) > 0 && !uuo.mutation.GamesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.GamesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

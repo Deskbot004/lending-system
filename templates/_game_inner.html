@@ -14,6 +14,9 @@
               <h3 class="page-title">{{ .Username }} &nbsp;&nbsp;
                 <a href="/deleteUser/{{.Username}}" class="btn btn-gradient-danger btn-rounded btn-fw btn-sm">
                   <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Nutzer löschen
+                </a> &nbsp;&nbsp;
+                <a href="#" class="btn btn-gradient-success btn-rounded btn-fw btn-sm">
+                  <i class="mdi mdi-pencil"></i>&nbsp;&nbsp;Nutzer bearbeiten
                 </a>
               </h3>
               <p class="text-danger">{{ .Error}}</p>
@@ -52,11 +55,13 @@
                           <td>{{ .Name}}</td>
                           <td>{{ .Type}}</td>
                           <td><ul>
-                            <li>{{ .Name}}</li>
-                            <li>{{ .Name}}</li>
+                            <li>Original: {{ .Ou}}</li>
+                            <li>Jetzt: {{ .Cu}}</li>
                           </ul></td>
-                          <td>{{ .Type}}</td>
-                          <td>{{ .Type}}</td>
+                          <td>{{ .Notes}}</td>
+                          <td><a href="#"><button type="button" class="btn btn-gradient-success btn-rounded btn-icon">
+                            <i class="mdi mdi-pencil"></i>
+                          </button></a></td>
                         </tr>
                         {{ end}}
                       </tbody>

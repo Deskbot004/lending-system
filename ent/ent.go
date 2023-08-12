@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"lending-system/ent/game"
-	"lending-system/ent/lending"
 	"lending-system/ent/user"
 	"reflect"
 	"sync"
@@ -75,9 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			game.Table:    game.ValidColumn,
-			lending.Table: lending.ValidColumn,
-			user.Table:    user.ValidColumn,
+			game.Table: game.ValidColumn,
+			user.Table: user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

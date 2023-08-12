@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"lending-system/ent/game"
 	"lending-system/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -23,6 +24,21 @@ type UserCreate struct {
 func (uc *UserCreate) SetName(s string) *UserCreate {
 	uc.mutation.SetName(s)
 	return uc
+}
+
+// AddGameIDs adds the "games" edge to the Game entity by IDs.
+func (uc *UserCreate) AddGameIDs(ids ...int) *UserCreate {
+	uc.mutation.AddGameIDs(ids...)
+	return uc
+}
+
+// AddGames adds the "games" edges to the Game entity.
+func (uc *UserCreate) AddGames(g ...*Game) *UserCreate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uc.AddGameIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -91,6 +107,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if nodes := uc.mutation.GamesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   user.GamesTable,
+			Columns: user.GamesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(game.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

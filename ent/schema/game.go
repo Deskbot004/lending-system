@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -19,10 +20,17 @@ func (Game) Fields() []ent.Field {
 			Default("unknown"),
 		field.String("ou").
 			Default("unknown"),
+		field.String("cu").
+			Default("unknown"),
+		field.String("notes").
+			Default("unknown"),
 	}
 }
 
 // Edges of the Game.
 func (Game) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).
+			Ref("games"),
+	}
 }

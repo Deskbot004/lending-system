@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"lending-system/ent/game"
+	"lending-system/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -61,6 +62,49 @@ func (gc *GameCreate) SetNillableOu(s *string) *GameCreate {
 	return gc
 }
 
+// SetCu sets the "cu" field.
+func (gc *GameCreate) SetCu(s string) *GameCreate {
+	gc.mutation.SetCu(s)
+	return gc
+}
+
+// SetNillableCu sets the "cu" field if the given value is not nil.
+func (gc *GameCreate) SetNillableCu(s *string) *GameCreate {
+	if s != nil {
+		gc.SetCu(*s)
+	}
+	return gc
+}
+
+// SetNotes sets the "notes" field.
+func (gc *GameCreate) SetNotes(s string) *GameCreate {
+	gc.mutation.SetNotes(s)
+	return gc
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (gc *GameCreate) SetNillableNotes(s *string) *GameCreate {
+	if s != nil {
+		gc.SetNotes(*s)
+	}
+	return gc
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (gc *GameCreate) AddUserIDs(ids ...int) *GameCreate {
+	gc.mutation.AddUserIDs(ids...)
+	return gc
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (gc *GameCreate) AddUser(u ...*User) *GameCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return gc.AddUserIDs(ids...)
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gc *GameCreate) Mutation() *GameMutation {
 	return gc.mutation
@@ -108,6 +152,14 @@ func (gc *GameCreate) defaults() {
 		v := game.DefaultOu
 		gc.mutation.SetOu(v)
 	}
+	if _, ok := gc.mutation.Cu(); !ok {
+		v := game.DefaultCu
+		gc.mutation.SetCu(v)
+	}
+	if _, ok := gc.mutation.Notes(); !ok {
+		v := game.DefaultNotes
+		gc.mutation.SetNotes(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -120,6 +172,12 @@ func (gc *GameCreate) check() error {
 	}
 	if _, ok := gc.mutation.Ou(); !ok {
 		return &ValidationError{Name: "ou", err: errors.New(`ent: missing required field "Game.ou"`)}
+	}
+	if _, ok := gc.mutation.Cu(); !ok {
+		return &ValidationError{Name: "cu", err: errors.New(`ent: missing required field "Game.cu"`)}
+	}
+	if _, ok := gc.mutation.Notes(); !ok {
+		return &ValidationError{Name: "notes", err: errors.New(`ent: missing required field "Game.notes"`)}
 	}
 	return nil
 }
@@ -158,6 +216,30 @@ func (gc *GameCreate) createSpec() (*Game, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.Ou(); ok {
 		_spec.SetField(game.FieldOu, field.TypeString, value)
 		_node.Ou = value
+	}
+	if value, ok := gc.mutation.Cu(); ok {
+		_spec.SetField(game.FieldCu, field.TypeString, value)
+		_node.Cu = value
+	}
+	if value, ok := gc.mutation.Notes(); ok {
+		_spec.SetField(game.FieldNotes, field.TypeString, value)
+		_node.Notes = value
+	}
+	if nodes := gc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -7,25 +7,6 @@ import (
 	"lending-system/sql"
 )
 
-type Gameinfo struct {
-	Name     string
-	Type     string
-	Origuser string
-	Curruser string
-	Note     string
-}
-
-func newGameinfo() Gameinfo {
-	info := Gameinfo{
-		Name:     "Test",
-		Type:     "Test4",
-		Origuser: "Testo",
-		Curruser: "Testi",
-		Note:     "Test3",
-	}
-	return info
-}
-
 func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*ent.Game, error) {
 	users, err := sql.GetAllUsers(ctx, client)
 	if err != nil {

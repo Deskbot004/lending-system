@@ -4,6 +4,7 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -13,8 +14,15 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// EdgeGames holds the string denoting the games edge name in mutations.
+	EdgeGames = "games"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// GamesTable is the table that holds the games relation/edge. The primary key declared below.
+	GamesTable = "user_games"
+	// GamesInverseTable is the table name for the Game entity.
+	// It exists in this package in order to avoid circular dependency with the "game" package.
+	GamesInverseTable = "games"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -22,6 +30,12 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 }
+
+var (
+	// GamesPrimaryKey and GamesColumn2 are the table columns denoting the
+	// primary key for the games relation (M2M).
+	GamesPrimaryKey = []string{"user_id", "game_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -44,4 +58,25 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByGamesCount orders the results by games count.
+func ByGamesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGamesStep(), opts...)
+	}
+}
+
+// ByGames orders the results by games terms.
+func ByGames(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGamesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newGamesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GamesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, GamesTable, GamesPrimaryKey...),
+	)
 }

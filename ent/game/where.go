@@ -6,6 +6,7 @@ import (
 	"lending-system/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -66,6 +67,16 @@ func Type(v string) predicate.Game {
 // Ou applies equality check predicate on the "ou" field. It's identical to OuEQ.
 func Ou(v string) predicate.Game {
 	return predicate.Game(sql.FieldEQ(FieldOu, v))
+}
+
+// Cu applies equality check predicate on the "cu" field. It's identical to CuEQ.
+func Cu(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldCu, v))
+}
+
+// Notes applies equality check predicate on the "notes" field. It's identical to NotesEQ.
+func Notes(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldNotes, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -261,6 +272,159 @@ func OuEqualFold(v string) predicate.Game {
 // OuContainsFold applies the ContainsFold predicate on the "ou" field.
 func OuContainsFold(v string) predicate.Game {
 	return predicate.Game(sql.FieldContainsFold(FieldOu, v))
+}
+
+// CuEQ applies the EQ predicate on the "cu" field.
+func CuEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldCu, v))
+}
+
+// CuNEQ applies the NEQ predicate on the "cu" field.
+func CuNEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldNEQ(FieldCu, v))
+}
+
+// CuIn applies the In predicate on the "cu" field.
+func CuIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldIn(FieldCu, vs...))
+}
+
+// CuNotIn applies the NotIn predicate on the "cu" field.
+func CuNotIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldNotIn(FieldCu, vs...))
+}
+
+// CuGT applies the GT predicate on the "cu" field.
+func CuGT(v string) predicate.Game {
+	return predicate.Game(sql.FieldGT(FieldCu, v))
+}
+
+// CuGTE applies the GTE predicate on the "cu" field.
+func CuGTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldGTE(FieldCu, v))
+}
+
+// CuLT applies the LT predicate on the "cu" field.
+func CuLT(v string) predicate.Game {
+	return predicate.Game(sql.FieldLT(FieldCu, v))
+}
+
+// CuLTE applies the LTE predicate on the "cu" field.
+func CuLTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldLTE(FieldCu, v))
+}
+
+// CuContains applies the Contains predicate on the "cu" field.
+func CuContains(v string) predicate.Game {
+	return predicate.Game(sql.FieldContains(FieldCu, v))
+}
+
+// CuHasPrefix applies the HasPrefix predicate on the "cu" field.
+func CuHasPrefix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasPrefix(FieldCu, v))
+}
+
+// CuHasSuffix applies the HasSuffix predicate on the "cu" field.
+func CuHasSuffix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasSuffix(FieldCu, v))
+}
+
+// CuEqualFold applies the EqualFold predicate on the "cu" field.
+func CuEqualFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldEqualFold(FieldCu, v))
+}
+
+// CuContainsFold applies the ContainsFold predicate on the "cu" field.
+func CuContainsFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldContainsFold(FieldCu, v))
+}
+
+// NotesEQ applies the EQ predicate on the "notes" field.
+func NotesEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldEQ(FieldNotes, v))
+}
+
+// NotesNEQ applies the NEQ predicate on the "notes" field.
+func NotesNEQ(v string) predicate.Game {
+	return predicate.Game(sql.FieldNEQ(FieldNotes, v))
+}
+
+// NotesIn applies the In predicate on the "notes" field.
+func NotesIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldIn(FieldNotes, vs...))
+}
+
+// NotesNotIn applies the NotIn predicate on the "notes" field.
+func NotesNotIn(vs ...string) predicate.Game {
+	return predicate.Game(sql.FieldNotIn(FieldNotes, vs...))
+}
+
+// NotesGT applies the GT predicate on the "notes" field.
+func NotesGT(v string) predicate.Game {
+	return predicate.Game(sql.FieldGT(FieldNotes, v))
+}
+
+// NotesGTE applies the GTE predicate on the "notes" field.
+func NotesGTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldGTE(FieldNotes, v))
+}
+
+// NotesLT applies the LT predicate on the "notes" field.
+func NotesLT(v string) predicate.Game {
+	return predicate.Game(sql.FieldLT(FieldNotes, v))
+}
+
+// NotesLTE applies the LTE predicate on the "notes" field.
+func NotesLTE(v string) predicate.Game {
+	return predicate.Game(sql.FieldLTE(FieldNotes, v))
+}
+
+// NotesContains applies the Contains predicate on the "notes" field.
+func NotesContains(v string) predicate.Game {
+	return predicate.Game(sql.FieldContains(FieldNotes, v))
+}
+
+// NotesHasPrefix applies the HasPrefix predicate on the "notes" field.
+func NotesHasPrefix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasPrefix(FieldNotes, v))
+}
+
+// NotesHasSuffix applies the HasSuffix predicate on the "notes" field.
+func NotesHasSuffix(v string) predicate.Game {
+	return predicate.Game(sql.FieldHasSuffix(FieldNotes, v))
+}
+
+// NotesEqualFold applies the EqualFold predicate on the "notes" field.
+func NotesEqualFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldEqualFold(FieldNotes, v))
+}
+
+// NotesContainsFold applies the ContainsFold predicate on the "notes" field.
+func NotesContainsFold(v string) predicate.Game {
+	return predicate.Game(sql.FieldContainsFold(FieldNotes, v))
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Game {
+	return predicate.Game(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, UserTable, UserPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Game {
+	return predicate.Game(func(s *sql.Selector) {
+		step := newUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

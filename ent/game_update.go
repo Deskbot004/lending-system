@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"lending-system/ent/game"
 	"lending-system/ent/predicate"
+	"lending-system/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -69,9 +70,73 @@ func (gu *GameUpdate) SetNillableOu(s *string) *GameUpdate {
 	return gu
 }
 
+// SetCu sets the "cu" field.
+func (gu *GameUpdate) SetCu(s string) *GameUpdate {
+	gu.mutation.SetCu(s)
+	return gu
+}
+
+// SetNillableCu sets the "cu" field if the given value is not nil.
+func (gu *GameUpdate) SetNillableCu(s *string) *GameUpdate {
+	if s != nil {
+		gu.SetCu(*s)
+	}
+	return gu
+}
+
+// SetNotes sets the "notes" field.
+func (gu *GameUpdate) SetNotes(s string) *GameUpdate {
+	gu.mutation.SetNotes(s)
+	return gu
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (gu *GameUpdate) SetNillableNotes(s *string) *GameUpdate {
+	if s != nil {
+		gu.SetNotes(*s)
+	}
+	return gu
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (gu *GameUpdate) AddUserIDs(ids ...int) *GameUpdate {
+	gu.mutation.AddUserIDs(ids...)
+	return gu
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (gu *GameUpdate) AddUser(u ...*User) *GameUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return gu.AddUserIDs(ids...)
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (gu *GameUpdate) Mutation() *GameMutation {
 	return gu.mutation
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (gu *GameUpdate) ClearUser() *GameUpdate {
+	gu.mutation.ClearUser()
+	return gu
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (gu *GameUpdate) RemoveUserIDs(ids ...int) *GameUpdate {
+	gu.mutation.RemoveUserIDs(ids...)
+	return gu
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (gu *GameUpdate) RemoveUser(u ...*User) *GameUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return gu.RemoveUserIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -118,6 +183,57 @@ func (gu *GameUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := gu.mutation.Ou(); ok {
 		_spec.SetField(game.FieldOu, field.TypeString, value)
+	}
+	if value, ok := gu.mutation.Cu(); ok {
+		_spec.SetField(game.FieldCu, field.TypeString, value)
+	}
+	if value, ok := gu.mutation.Notes(); ok {
+		_spec.SetField(game.FieldNotes, field.TypeString, value)
+	}
+	if gu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.RemovedUserIDs(); len(nodes) > 0 && !gu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -181,9 +297,73 @@ func (guo *GameUpdateOne) SetNillableOu(s *string) *GameUpdateOne {
 	return guo
 }
 
+// SetCu sets the "cu" field.
+func (guo *GameUpdateOne) SetCu(s string) *GameUpdateOne {
+	guo.mutation.SetCu(s)
+	return guo
+}
+
+// SetNillableCu sets the "cu" field if the given value is not nil.
+func (guo *GameUpdateOne) SetNillableCu(s *string) *GameUpdateOne {
+	if s != nil {
+		guo.SetCu(*s)
+	}
+	return guo
+}
+
+// SetNotes sets the "notes" field.
+func (guo *GameUpdateOne) SetNotes(s string) *GameUpdateOne {
+	guo.mutation.SetNotes(s)
+	return guo
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (guo *GameUpdateOne) SetNillableNotes(s *string) *GameUpdateOne {
+	if s != nil {
+		guo.SetNotes(*s)
+	}
+	return guo
+}
+
+// AddUserIDs adds the "user" edge to the User entity by IDs.
+func (guo *GameUpdateOne) AddUserIDs(ids ...int) *GameUpdateOne {
+	guo.mutation.AddUserIDs(ids...)
+	return guo
+}
+
+// AddUser adds the "user" edges to the User entity.
+func (guo *GameUpdateOne) AddUser(u ...*User) *GameUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return guo.AddUserIDs(ids...)
+}
+
 // Mutation returns the GameMutation object of the builder.
 func (guo *GameUpdateOne) Mutation() *GameMutation {
 	return guo.mutation
+}
+
+// ClearUser clears all "user" edges to the User entity.
+func (guo *GameUpdateOne) ClearUser() *GameUpdateOne {
+	guo.mutation.ClearUser()
+	return guo
+}
+
+// RemoveUserIDs removes the "user" edge to User entities by IDs.
+func (guo *GameUpdateOne) RemoveUserIDs(ids ...int) *GameUpdateOne {
+	guo.mutation.RemoveUserIDs(ids...)
+	return guo
+}
+
+// RemoveUser removes "user" edges to User entities.
+func (guo *GameUpdateOne) RemoveUser(u ...*User) *GameUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return guo.RemoveUserIDs(ids...)
 }
 
 // Where appends a list predicates to the GameUpdate builder.
@@ -260,6 +440,57 @@ func (guo *GameUpdateOne) sqlSave(ctx context.Context) (_node *Game, err error) 
 	}
 	if value, ok := guo.mutation.Ou(); ok {
 		_spec.SetField(game.FieldOu, field.TypeString, value)
+	}
+	if value, ok := guo.mutation.Cu(); ok {
+		_spec.SetField(game.FieldCu, field.TypeString, value)
+	}
+	if value, ok := guo.mutation.Notes(); ok {
+		_spec.SetField(game.FieldNotes, field.TypeString, value)
+	}
+	if guo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.RemovedUserIDs(); len(nodes) > 0 && !guo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   game.UserTable,
+			Columns: game.UserPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Game{config: guo.config}
 	_spec.Assign = _node.assignValues
