@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{ template "header.html"}}
+  <body>
+    <div class="container-scroller">
+      {{ template "navbar.html"}}
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        {{ template "sidebar.html"}}
+        <!-- partial -->
+        <div class="main-panel">
+          <div class="content-wrapper">
+            <div class="page-header">
+              <h3 class="page-title"> Configure a project </h3>
+              <p class="text-danger">{{ .Error}}</p>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="/overview">Project overview</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Configure project</li>
+                </ol>
+              </nav>
+            </div>
+            <form class="forms-sample" action="overview/config/update/{{ .Project.Gitid }}" method="post">
+            <div class="row">
+              <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                      <h4 class="card-title">Informations of {{ .Project.Name }}
+                        &nbsp;&nbsp;
+                        <a class="btn btn-gradient-danger btn-rounded btn-fw btn-sm" href="/delete/{{.Project.Gitid}}/{{.Project.Name}}" style="text-decoration: none;">
+                        <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Delete Project</a>
+                      </h4>
+                      <p class="card-description"> Please enter the information the project should have</p>
+                      
+                      <div class="form-group">
+                          <label for="InputProjectName">Name of the project</label>
+                          <input type="text" class="form-control" id="InputProjectName" name="name" value="{{ .Project.Name }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="InputConfluence">Confluence link</label>
+                        <input type="text" class="form-control" id="InputConfluence" name="confluence" value="{{ .Project.Confluence }}">
+                      </div>
+                      <div class="form-group">
+                          <label for="InputTech">Technical lead</label>
+                          <input type="text" class="form-control" id="InputTech" name="techL" value="{{ .Project.Techlead }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="InputProj">Project lead</label>
+                        <input type="text" class="form-control" id="InputProj" name="projL" value="{{ .Project.Projectlead }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="InputNote">Notes</label>
+                        <textarea class="form-control" id="InputNote" name="notes" rows="8">{{ .Project.Notes }}</textarea>
+                      </div>
+                      <p class="text-danger">{{ .Error}}</p>
+                      <button type="submit" class="btn btn-gradient-primary me-2" value="save" name="submit">Save</button>
+                      <a class="btn btn-light" href="/overview">Return</a>
+                      </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Instances of {{ .Project.Name }}
+                      &nbsp;&nbsp;
+                      <button type="submit" class="btn btn-gradient-success btn-rounded btn-fw btn-sm" value="add" name="submit">
+                      <i class="mdi mdi-library-plus"></i>&nbsp;&nbsp;Add Instance</button>
+                    </h4>
+                    {{ template "instanceform.html" .Project.Edges}}
+                  </div>
+                </div>
+              </div>
+            </div></form>
+          <!-- content-wrapper ends -->
+          <!-- partial:/partials/_footer.html -->
+          {{ template "footer.html"}}
+          <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="/assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/assets/js/off-canvas.js"></script>
+    <script src="/assets/js/hoverable-collapse.js"></script>
+    <script src="/assets/js/misc.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+  </body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<div class="col-lg-4 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+        <h4 class="card-title">All Projects</h4>
+        <p class="card-description"> Click on a project for details
+        </p>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Project</th>
+                <th>Php Version</th>
+                <th>Typo3 Version</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range .Projects}}
+            <tr style="transform: rotate(0); {{ if eq .Name $.Active }}background-color: #e1effc;{{end}}">
+                <th scope="row"><a class="stretched-link" href="/versions/project/{{.Gitid}}/{{.Name}}" style="color: #940091ad;
+                text-decoration: none;">{{ .Name}}</a></th>
+                <td>{{ .Phpversion}}</td>
+                <td>{{ .Typo3version}}</td>
+            </tr>
+            {{ end}}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
