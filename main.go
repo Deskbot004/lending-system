@@ -57,5 +57,4 @@ func main() {
 
 	// TODO upload image for icon
 	// TODO download Db
-	// test push
 }
