@@ -55,5 +55,6 @@ func main() {
 	*/
 	web.StartServer(client)
 	// TODO upload image for icon -> Sort by ausgeliehen
-	// TODO Admin view? 
+	// TODO Admin view?
+	// TODO search bar for game search
 }
