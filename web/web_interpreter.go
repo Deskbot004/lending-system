@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"lending-system/ent"
 	"lending-system/sql"
+
+	"github.com/gin-gonic/gin"
 )
 
 func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*ent.Game, error) {
@@ -17,4 +19,8 @@ func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*
 		return nil, nil, fmt.Errorf("getting all games failed: %v", err)
 	}
 	return users, games, err
+}
+
+func checkElseredirect(c *gin.Context) {
+
 }

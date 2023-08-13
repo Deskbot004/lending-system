@@ -9,16 +9,17 @@
             <div class="col-lg-4 mx-auto">
               <div class="auth-form-light text-left p-5">
                 <div class="brand-logo">
-                  <img src="../../assets/images/logo-login.png">
+                  <img src="/assets/images/logo-login.png">
                 </div>
                 <h4>Hello! Ich bin Justin, ich mag di...</h4>
-                <h6 class="font-weight-light">Gib Jussi ein bussi 😋</h6>
-                <form class="pt-3">
+                <h6 class="font-weight-light">Gib Jussi ein bussi! 😋</h6>
+                <form class="forms-sample pt-3" action="/login" method="post">
                   <div class="form-group">
-                    <input type="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Passwort">
+                    <input type="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Passwort" name="pw">
                   </div>
                   <div class="mt-3">
-                    <a class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn" href="/index">ANMELDEN</a>
+                    <p class="text-danger">{{ .Error}}</p>
+                    <button class="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn" type="submit">ANMELDEN</button>
                   </div>
                   <div class="my-2 d-flex justify-content-between align-items-center">
                     <div class="form-check">

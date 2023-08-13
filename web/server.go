@@ -22,14 +22,48 @@ func StartServer(client *ent.Client) {
 	router.Static("/assets", "./assets")
 	var err error
 	var errMess string
+	password := "SeanJonas"
+	errMess = ""
 
 	// Landing Pate login later
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "_login.html", 1)
+		errMess = ""
+		c.HTML(http.StatusOK, "_login.html", gin.H{
+			"Error":   errMess,
+		})
+	})
+
+	router.POST("/login", func(c *gin.Context) {
+		errMess = ""
+		givenPassword := c.PostForm("pw")
+		if givenPassword != password {
+			errMess = "Falsches Passwort"
+			c.HTML(http.StatusOK, "_login.html", gin.H{
+				"Error":   errMess,
+			})
+		} else {
+			users, games, err := getGamesAndUsers(context.Background(), client)
+			if err != nil {
+				errMess = "Error happened"
+				log.Println(err)
+			}
+			//c.Writer.Header().Add("login", "true")
+			c.HTML(http.StatusOK, "_dashboard.html", gin.H{
+				"Usernum": len(users),
+				"Gamenum": len(games),
+				"Error":   errMess,
+			})
+		}
 	})
 
 	// Startpage _dashboard.html
 	router.GET("/index", func(c *gin.Context) {
+		errMess = ""
+		/*println(c.Request.Header.Get("login"))
+		println(c.Request.Header.Get("login") != "true")
+		if c.Request.Header.Get("login") != "true" {
+			errMess = "Not working"
+		}*/
 		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
 			errMess = "Error happened"
@@ -44,6 +78,7 @@ func StartServer(client *ent.Client) {
 
 	// Game overviews
 	router.GET("/game_overview", func(c *gin.Context) {
+		errMess = ""
 		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
 			errMess = "Error happened"
@@ -58,6 +93,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/game_overview/:name", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
@@ -84,6 +120,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/game_overview/:name/addGame", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		c.HTML(http.StatusOK, "_addGame.html", gin.H{
 			"Username": name,
@@ -92,8 +129,9 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/addGame", func(c *gin.Context) {
+		errMess = ""
 		username := c.Param("name")
-		gametype := c.PostForm("type")
+		gametype := c.PostForm("gametype")
 		gamename := c.PostForm("name")
 		game := ent.Game{
 			Name: gamename,
@@ -132,6 +170,7 @@ func StartServer(client *ent.Client) {
 
 	// config views
 	router.GET("/game_overview/:name/edit", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
@@ -145,6 +184,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/edit", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		newname := c.PostForm("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
@@ -181,6 +221,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		gameid := c.Param("gameid")
 		gameidInt, _ := strconv.Atoi(gameid)
@@ -203,6 +244,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
+		errMess = ""
 		name := c.Param("name")
 		gameid := c.Param("gameid")
 		gameidInt, _ := strconv.Atoi(gameid)
@@ -248,6 +290,7 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/deleteUser/:name", func(c *gin.Context) {
+		errMess = ""
 		//TODO delete all Games too
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
@@ -275,12 +318,14 @@ func StartServer(client *ent.Client) {
 
 	// Adding Users
 	router.GET("/addUser", func(c *gin.Context) {
+		errMess = ""
 		c.HTML(http.StatusOK, "_addUser.html", gin.H{
 			"Error": errMess,
 		})
 	})
 
 	router.POST("/addUser", func(c *gin.Context) {
+		errMess = ""
 		username := c.PostForm("name")
 		user := ent.User{
 			Name: username,
@@ -307,6 +352,7 @@ func StartServer(client *ent.Client) {
 
 	// No route
 	router.NoRoute(func(c *gin.Context) {
+		errMess = ""
 		c.HTML(http.StatusNotFound, "_404.html", 1)
 	})
 

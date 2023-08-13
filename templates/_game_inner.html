@@ -44,7 +44,7 @@
                         <tr>
                           <th>Name</th>
                           <th>Typ</th>
-                          <th>Besitzer</th>
+                          <th></th>
                           <th>Notiz</th>
                           <th>Bearbeiten</th>
                         </tr>
@@ -55,10 +55,10 @@
                           <td>{{ .Name}}</td>
                           <td>{{ .Type}}</td>
                           <td><ul>
-                            <li>Original: {{ .Ou}}</li>
-                            <li>Jetzt: {{ .Cu}}</li>
+                            <li>Eigentümer: {{ .Ou}}</li>
+                            <li>Besitzer: {{ .Cu}}</li>
                           </ul></td>
-                          <td>{{ .Notes}}</td>
+                          <td style="white-space: pre-wrap;">{{ .Notes}}</td>
                           <td><a href="/game_overview/{{$.Username}}/{{.ID}}/edit"><button type="button" class="btn btn-gradient-success btn-rounded btn-icon">
                             <i class="mdi mdi-pencil"></i>
                           </button></a></td>
