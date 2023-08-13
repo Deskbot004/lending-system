@@ -8,8 +8,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
+var router *gin.Engine
+var errMess string
 
 /*
 StartServer starts the web server
@@ -17,29 +21,33 @@ StartServer starts the web server
 client: client that requested the database
 */
 func StartServer(client *ent.Client) {
-	router := gin.Default()
+	router = gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
+	router.Static("/db", "./db")
+
+	store := cookie.NewStore([]byte("secret"))
+	router.Use(sessions.Sessions("mysession", store))
+
 	var err error
-	var errMess string
 	password := "SeanJonas"
 	errMess = ""
 
+	router.Use(aheader())
+
 	// Landing Pate login later
 	router.GET("/", func(c *gin.Context) {
-		errMess = ""
 		c.HTML(http.StatusOK, "_login.html", gin.H{
-			"Error":   errMess,
+			"Error": errMess,
 		})
 	})
 
-	router.POST("/login", func(c *gin.Context) {
-		errMess = ""
+	router.POST("/", func(c *gin.Context) {
 		givenPassword := c.PostForm("pw")
 		if givenPassword != password {
 			errMess = "Falsches Passwort"
 			c.HTML(http.StatusOK, "_login.html", gin.H{
-				"Error":   errMess,
+				"Error": errMess,
 			})
 		} else {
 			users, games, err := getGamesAndUsers(context.Background(), client)
@@ -47,7 +55,9 @@ func StartServer(client *ent.Client) {
 				errMess = "Error happened"
 				log.Println(err)
 			}
-			//c.Writer.Header().Add("login", "true")
+			session := sessions.Default(c)
+			session.Set("login", "true")
+			session.Save()
 			c.HTML(http.StatusOK, "_dashboard.html", gin.H{
 				"Usernum": len(users),
 				"Gamenum": len(games),
@@ -58,12 +68,6 @@ func StartServer(client *ent.Client) {
 
 	// Startpage _dashboard.html
 	router.GET("/index", func(c *gin.Context) {
-		errMess = ""
-		/*println(c.Request.Header.Get("login"))
-		println(c.Request.Header.Get("login") != "true")
-		if c.Request.Header.Get("login") != "true" {
-			errMess = "Not working"
-		}*/
 		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
 			errMess = "Error happened"
@@ -78,7 +82,6 @@ func StartServer(client *ent.Client) {
 
 	// Game overviews
 	router.GET("/game_overview", func(c *gin.Context) {
-		errMess = ""
 		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
 			errMess = "Error happened"

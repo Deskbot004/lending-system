@@ -6,6 +6,7 @@ import (
 	"lending-system/ent"
 	"lending-system/sql"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,6 +22,24 @@ func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*
 	return users, games, err
 }
 
-func checkElseredirect(c *gin.Context) {
+func checkElseredirect(c *gin.Context, r *gin.Engine) bool {
+	session := sessions.Default(c)
+	if session.Get("login") != "true" {
+		c.Request.URL.Path = "/"
+		r.HandleContext(c)
+		return true
+	}
+	return false
+}
 
+func aheader() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/" {
+			return
+		}
+		errMess = ""
+		if checkElseredirect(c, router) {
+			return
+		}
+	}
 }

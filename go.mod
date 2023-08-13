@@ -6,6 +6,10 @@ require github.com/gin-gonic/gin v1.9.1
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/gin-contrib/sessions v0.0.5 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
