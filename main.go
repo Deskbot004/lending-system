@@ -54,6 +54,6 @@ func main() {
 	}
 	*/
 	web.StartServer(client)
-	// cleanup games from deleted user // redirect rework // delete single games
-	// TODO upload image for icon
+	// TODO upload image for icon -> Sort by ausgeliehen
+	// TODO Admin view? 
 }
