@@ -26,7 +26,12 @@
               <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                      <h4 class="card-title">Informationen von {{ .Game.Name }}</h4>
+                      <h4 class="card-title">Informationen von {{ .Game.Name }}
+                        &nbsp;&nbsp;
+                        <a href="/deleteGame/{{.Game.ID}}" class="btn btn-gradient-danger btn-rounded btn-fw btn-sm">
+                          <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Spiel löschen
+                        </a>
+                      </h4>
                       <p class="card-description"> Bitte gebe die gewünschten Daten ein</p>
                       <div class="form-group">
                           <label for="InputName">Name des Spiels</label>

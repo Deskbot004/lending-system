@@ -26,7 +26,12 @@
               <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                      <h4 class="card-title">Informationen von {{ .User.Name }}</h4>
+                      <h4 class="card-title">Informationen von {{ .User.Name }}
+                        &nbsp;&nbsp;
+                        <a href="/deleteUser/{{.User.Name}}" class="btn btn-gradient-danger btn-rounded btn-fw btn-sm">
+                          <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Nutzer löschen
+                        </a>
+                      </h4>
                       <p class="card-description"> Bitte gebe die gewollten Daten ein</p>
                       
                       <div class="form-group">

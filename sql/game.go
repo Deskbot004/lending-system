@@ -61,3 +61,13 @@ func GetGameByID(ctx context.Context, client *ent.Client, ID int) (*ent.Game, er
 	}
 	return u, nil
 }
+
+func DeleteGame(ctx context.Context, client *ent.Client, game *ent.Game) error {
+	err := client.Game.
+		DeleteOne(game).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed deleting game: %w", err)
+	}
+	return nil
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"lending-system/ent"
 	"lending-system/sql"
+	"net/http"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -22,11 +23,10 @@ func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*
 	return users, games, err
 }
 
-func checkElseredirect(c *gin.Context, r *gin.Engine) bool {
+func checkElseredirect(c *gin.Context) bool {
 	session := sessions.Default(c)
 	if session.Get("login") != "true" {
-		c.Request.URL.Path = "/"
-		r.HandleContext(c)
+		c.Redirect(http.StatusTemporaryRedirect, "/")
 		return true
 	}
 	return false
@@ -38,8 +38,26 @@ func aheader() gin.HandlerFunc {
 			return
 		}
 		errMess = ""
-		if checkElseredirect(c, router) {
+		if checkElseredirect(c) {
 			return
 		}
 	}
+}
+
+func cleanDeleteUser(ctx context.Context, client *ent.Client, user *ent.User) error {
+	games, err := sql.GetUserGames(ctx, user)
+	if err != nil {
+		return err
+	}
+	for i := range games {
+		err = sql.DeleteGame(ctx, client, games[i])
+		if err != nil {
+			return err
+		}
+	}
+	err = sql.DeleteUser(ctx, client, user)
+	if err != nil {
+		return err
+	}
+	return nil
 }

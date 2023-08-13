@@ -12,7 +12,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
-var router *gin.Engine
+
 var errMess string
 
 /*
@@ -21,7 +21,7 @@ StartServer starts the web server
 client: client that requested the database
 */
 func StartServer(client *ent.Client) {
-	router = gin.Default()
+	router := gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 	router.Static("/db", "./db")
@@ -50,19 +50,10 @@ func StartServer(client *ent.Client) {
 				"Error": errMess,
 			})
 		} else {
-			users, games, err := getGamesAndUsers(context.Background(), client)
-			if err != nil {
-				errMess = "Error happened"
-				log.Println(err)
-			}
 			session := sessions.Default(c)
 			session.Set("login", "true")
 			session.Save()
-			c.HTML(http.StatusOK, "_dashboard.html", gin.H{
-				"Usernum": len(users),
-				"Gamenum": len(games),
-				"Error":   errMess,
-			})
+			c.Redirect(http.StatusFound, "/index")
 		}
 	})
 
@@ -96,7 +87,6 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/game_overview/:name", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
@@ -123,7 +113,6 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.GET("/game_overview/:name/addGame", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		c.HTML(http.StatusOK, "_addGame.html", gin.H{
 			"Username": name,
@@ -132,7 +121,6 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/addGame", func(c *gin.Context) {
-		errMess = ""
 		username := c.Param("name")
 		gametype := c.PostForm("gametype")
 		gamename := c.PostForm("name")
@@ -152,28 +140,11 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		users, _, err := getGamesAndUsers(context.Background(), client)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		games, err := sql.GetUserGames(context.Background(), user)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
-			"Users":    users,
-			"Username": user.Name,
-			"Games":    games,
-			"Gamenum":  len(games),
-			"Error":    errMess,
-		})
+		c.Redirect(http.StatusFound, "/game_overview/"+username)
 	})
 
 	// config views
 	router.GET("/game_overview/:name/edit", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
@@ -187,7 +158,6 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/edit", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		newname := c.PostForm("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
@@ -204,27 +174,10 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		users, _, err := getGamesAndUsers(context.Background(), client)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		games, err := sql.GetUserGames(context.Background(), user)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
-			"Users":    users,
-			"Username": newname,
-			"Games":    games,
-			"Gamenum":  len(games),
-			"Error":    errMess,
-		})
+		c.Redirect(http.StatusFound, "/game_overview/"+newname)
 	})
 
 	router.GET("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		gameid := c.Param("gameid")
 		gameidInt, _ := strconv.Atoi(gameid)
@@ -247,17 +200,10 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/:gameid/edit", func(c *gin.Context) {
-		errMess = ""
 		name := c.Param("name")
 		gameid := c.Param("gameid")
 		gameidInt, _ := strconv.Atoi(gameid)
 		game, err := sql.GetGameByID(context.Background(), client, gameidInt)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-
-		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
 			errMess = "Error happened"
 			log.Println(err)
@@ -273,62 +219,48 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		users, _, err := getGamesAndUsers(context.Background(), client)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		games, err := sql.GetUserGames(context.Background(), user)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
-			"Users":    users,
-			"Username": name,
-			"Games":    games,
-			"Gamenum":  len(games),
-			"Error":    errMess,
-		})
+		c.Redirect(http.StatusFound, "/game_overview/"+name)
 	})
 
 	router.GET("/deleteUser/:name", func(c *gin.Context) {
-		errMess = ""
-		//TODO delete all Games too
 		name := c.Param("name")
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		err = sql.DeleteUser(context.Background(), client, user)
+		err = cleanDeleteUser(context.Background(), client, user)
 		if err != nil {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		users, games, err := getGamesAndUsers(context.Background(), client)
+		c.Redirect(http.StatusFound, "/game_overview")
+	})
+
+	router.GET("/deleteGame/:gameid", func(c *gin.Context) {
+		gameid := c.Param("gameid")
+		gameidInt, _ := strconv.Atoi(gameid)
+		game, err := sql.GetGameByID(context.Background(), client, gameidInt)
 		if err != nil {
 			errMess = "Error happened"
 			log.Println(err)
 		}
-		c.HTML(http.StatusOK, "_game_overview.html", gin.H{
-			"Users":   users,
-			"Games":   games,
-			"Gamenum": len(games),
-			"Error":   errMess,
-		})
+		err = sql.DeleteGame(context.Background(), client, game)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.Redirect(http.StatusFound, "/game_overview")
 	})
 
 	// Adding Users
 	router.GET("/addUser", func(c *gin.Context) {
-		errMess = ""
 		c.HTML(http.StatusOK, "_addUser.html", gin.H{
 			"Error": errMess,
 		})
 	})
 
 	router.POST("/addUser", func(c *gin.Context) {
-		errMess = ""
 		username := c.PostForm("name")
 		user := ent.User{
 			Name: username,
@@ -341,16 +273,7 @@ func StartServer(client *ent.Client) {
 			})
 		*/
 		// if success
-		users, games, err := getGamesAndUsers(context.Background(), client)
-		if err != nil {
-			errMess = "Error happened"
-			log.Println(err)
-		}
-		c.HTML(http.StatusOK, "_dashboard.html", gin.H{
-			"Usernum": len(users),
-			"Gamenum": len(games),
-			"Error":   errMess,
-		})
+		c.Redirect(http.StatusFound, "/game_overview")
 	})
 
 	// No route

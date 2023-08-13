@@ -54,7 +54,6 @@ func main() {
 	}
 	*/
 	web.StartServer(client)
-	// PW system // cleanup games from deleted user
-	// TODO download Db
+	// cleanup games from deleted user // redirect rework // delete single games
 	// TODO upload image for icon
 }
