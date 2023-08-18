@@ -5,6 +5,7 @@ package ent
 import (
 	"lending-system/ent/game"
 	"lending-system/ent/schema"
+	"lending-system/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -33,4 +34,10 @@ func init() {
 	gameDescNotes := gameFields[4].Descriptor()
 	// game.DefaultNotes holds the default value on creation for the notes field.
 	game.DefaultNotes = gameDescNotes.Default.(string)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescPicture is the schema descriptor for picture field.
+	userDescPicture := userFields[1].Descriptor()
+	// user.DefaultPicture holds the default value on creation for the picture field.
+	user.DefaultPicture = userDescPicture.Default.(string)
 }

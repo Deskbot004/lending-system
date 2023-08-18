@@ -21,7 +21,7 @@
                 </ol>
               </nav>
             </div>
-            <form class="forms-sample" action="/game_overview/{{.User.Name}}/edit" method="post">
+            <form class="forms-sample" action="/game_overview/{{.User.Name}}/edit" enctype="multipart/form-data" method="post">
             <div class="row">
               <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
@@ -37,6 +37,9 @@
                       <div class="form-group">
                           <label for="InputName">Name des Nutzers</label>
                           <input type="text" class="form-control" id="InputName" name="name" value="{{ .User.Name }}">
+                          <br>
+                          <label for="InputPic">Bild des Nutzers&nbsp;&nbsp;<img style="width: 25px; height: 25px;" src="/assets/images/user/{{.User.Picture}}"></img></label>
+                          <input type="file" class="form-control" id="InputPic" name="file">
                       </div>
                       <p class="text-danger">{{ .Error}}</p>
                       <button type="submit" class="btn btn-gradient-primary me-2" value="save" name="submit">Bestätigen</button>

@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldPicture holds the string denoting the picture field in the database.
+	FieldPicture = "picture"
 	// EdgeGames holds the string denoting the games edge name in mutations.
 	EdgeGames = "games"
 	// Table holds the table name of the user in the database.
@@ -29,6 +31,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldPicture,
 }
 
 var (
@@ -47,6 +50,11 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultPicture holds the default value on creation for the "picture" field.
+	DefaultPicture string
+)
+
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
 
@@ -58,6 +66,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByPicture orders the results by the picture field.
+func ByPicture(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPicture, opts...).ToFunc()
 }
 
 // ByGamesCount orders the results by games count.

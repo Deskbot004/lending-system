@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -25,6 +26,7 @@ func StartServer(client *ent.Client) {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 	router.Static("/db", "./db")
+	router.MaxMultipartMemory = 8 << 20
 
 	store := cookie.NewStore([]byte("secret"))
 	router.Use(sessions.Sessions("mysession", store))
@@ -158,16 +160,25 @@ func StartServer(client *ent.Client) {
 	})
 
 	router.POST("/game_overview/:name/edit", func(c *gin.Context) {
+		//redirect
 		name := c.Param("name")
 		newname := c.PostForm("name")
+
 		user, err := sql.GetUserByName(context.Background(), client, name)
 		if err != nil {
 			errMess = "Error happened"
 			log.Println(err)
 		}
 
+		picname, err := changePicture(c, user.Picture)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+
 		usernew := ent.User{
-			Name: newname,
+			Name:    newname,
+			Picture: picname,
 		}
 		err = sql.UpdateUser(context.Background(), user, usernew)
 		if err != nil {
@@ -257,6 +268,7 @@ func StartServer(client *ent.Client) {
 	router.GET("/addUser", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "_addUser.html", gin.H{
 			"Error": errMess,
+			"Name":  "",
 		})
 	})
 
@@ -265,14 +277,18 @@ func StartServer(client *ent.Client) {
 		user := ent.User{
 			Name: username,
 		}
-		sql.AddUser(context.Background(), client, user)
-		// if fail
-		/*
-			c.HTML(http.StatusOK, "_add.html", gin.H{
-				"Error":   errMess,
+		_, err = sql.AddUser(context.Background(), client, user)
+		if err != nil {
+			if strings.Contains(err.Error(), "users.name") {
+				errMess = "Ein Nutzer mit dem Namen existiert bereits, bitte gebe einen anderen Namen ein"
+			} else {
+				errMess = "Error happened"
+			}
+			c.HTML(http.StatusOK, "_addUser.html", gin.H{
+				"Error": errMess,
+				"Name":  username,
 			})
-		*/
-		// if success
+		}
 		c.Redirect(http.StatusFound, "/game_overview")
 	})
 

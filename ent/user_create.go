@@ -26,6 +26,20 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 	return uc
 }
 
+// SetPicture sets the "picture" field.
+func (uc *UserCreate) SetPicture(s string) *UserCreate {
+	uc.mutation.SetPicture(s)
+	return uc
+}
+
+// SetNillablePicture sets the "picture" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePicture(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPicture(*s)
+	}
+	return uc
+}
+
 // AddGameIDs adds the "games" edge to the Game entity by IDs.
 func (uc *UserCreate) AddGameIDs(ids ...int) *UserCreate {
 	uc.mutation.AddGameIDs(ids...)
@@ -48,6 +62,7 @@ func (uc *UserCreate) Mutation() *UserMutation {
 
 // Save creates the User in the database.
 func (uc *UserCreate) Save(ctx context.Context) (*User, error) {
+	uc.defaults()
 	return withHooks(ctx, uc.sqlSave, uc.mutation, uc.hooks)
 }
 
@@ -73,10 +88,21 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uc *UserCreate) defaults() {
+	if _, ok := uc.mutation.Picture(); !ok {
+		v := user.DefaultPicture
+		uc.mutation.SetPicture(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
+	}
+	if _, ok := uc.mutation.Picture(); !ok {
+		return &ValidationError{Name: "picture", err: errors.New(`ent: missing required field "User.picture"`)}
 	}
 	return nil
 }
@@ -107,6 +133,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Name(); ok {
 		_spec.SetField(user.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := uc.mutation.Picture(); ok {
+		_spec.SetField(user.FieldPicture, field.TypeString, value)
+		_node.Picture = value
 	}
 	if nodes := uc.mutation.GamesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -141,6 +171,7 @@ func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 	for i := range ucb.builders {
 		func(i int, root context.Context) {
 			builder := ucb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*UserMutation)
 				if !ok {

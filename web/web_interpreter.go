@@ -3,13 +3,22 @@ package web
 import (
 	"context"
 	"fmt"
+	"io"
 	"lending-system/ent"
 	"lending-system/sql"
+	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
+
+type Form struct {
+	File *multipart.FileHeader `form:"file" binding:"required"`
+}
 
 func getGamesAndUsers(ctx context.Context, client *ent.Client) ([]*ent.User, []*ent.Game, error) {
 	users, err := sql.GetAllUsers(ctx, client)
@@ -60,4 +69,41 @@ func cleanDeleteUser(ctx context.Context, client *ent.Client, user *ent.User) er
 		return err
 	}
 	return nil
+}
+
+func changePicture(c *gin.Context, oldpic string) (string, error) {
+	file, header, err := c.Request.FormFile("file")
+	if file == nil {
+		return oldpic, nil
+	}
+	if err != nil {
+		return "default.png", err
+	}
+	filename := header.Filename
+	if !strings.HasSuffix(filename, ".png") && !strings.HasSuffix(filename, ".jpg") {
+		log.Println(strings.HasSuffix(filename, ".png"))
+		log.Println(filename)
+		return "default.png", fmt.Errorf("file is not an image")
+	}
+
+	defer file.Close()
+	out, err := os.Create("./assets/images/user/" + filename)
+	if err != nil {
+		return "default.png", err
+	}
+
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		return "default.png", err
+	}
+
+	if filename != "default.png" {
+		err = os.Remove("./assets/images/user/" + oldpic)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+
+	return filename, err
 }

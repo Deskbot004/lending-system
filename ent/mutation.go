@@ -670,6 +670,7 @@ type UserMutation struct {
 	typ           string
 	id            *int
 	name          *string
+	picture       *string
 	clearedFields map[string]struct{}
 	games         map[int]struct{}
 	removedgames  map[int]struct{}
@@ -813,6 +814,42 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
+// SetPicture sets the "picture" field.
+func (m *UserMutation) SetPicture(s string) {
+	m.picture = &s
+}
+
+// Picture returns the value of the "picture" field in the mutation.
+func (m *UserMutation) Picture() (r string, exists bool) {
+	v := m.picture
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPicture returns the old "picture" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPicture(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPicture is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPicture requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPicture: %w", err)
+	}
+	return oldValue.Picture, nil
+}
+
+// ResetPicture resets all changes to the "picture" field.
+func (m *UserMutation) ResetPicture() {
+	m.picture = nil
+}
+
 // AddGameIDs adds the "games" edge to the Game entity by ids.
 func (m *UserMutation) AddGameIDs(ids ...int) {
 	if m.games == nil {
@@ -901,9 +938,12 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
+	}
+	if m.picture != nil {
+		fields = append(fields, user.FieldPicture)
 	}
 	return fields
 }
@@ -915,6 +955,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case user.FieldName:
 		return m.Name()
+	case user.FieldPicture:
+		return m.Picture()
 	}
 	return nil, false
 }
@@ -926,6 +968,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case user.FieldName:
 		return m.OldName(ctx)
+	case user.FieldPicture:
+		return m.OldPicture(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -941,6 +985,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case user.FieldPicture:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPicture(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -993,6 +1044,9 @@ func (m *UserMutation) ResetField(name string) error {
 	switch name {
 	case user.FieldName:
 		m.ResetName()
+		return nil
+	case user.FieldPicture:
+		m.ResetPicture()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

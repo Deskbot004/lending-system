@@ -16,6 +16,8 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			Unique(),
+		field.String("picture").
+			Default("default.png"),
 	}
 }
 

@@ -72,6 +72,7 @@ func GetUserGames(ctx context.Context, user *ent.User) ([]*ent.Game, error) {
 func UpdateUser(ctx context.Context, user *ent.User, usernew ent.User) error {
 	_, err := user.Update().
 	SetName(usernew.Name).
+	SetPicture(usernew.Picture).
 	Save(ctx)
 	if err != nil {
 		return fmt.Errorf("failed updating user: %w", err)
