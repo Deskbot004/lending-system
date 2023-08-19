@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/gin-contrib/sessions"
@@ -98,7 +99,7 @@ func changePicture(c *gin.Context, oldpic string) (string, error) {
 		return "default.png", err
 	}
 
-	if filename != "default.png" {
+	if oldpic != "default.png" {
 		err = os.Remove("./assets/images/user/" + oldpic)
 		if err != nil {
 			log.Println(err)
@@ -106,4 +107,28 @@ func changePicture(c *gin.Context, oldpic string) (string, error) {
 	}
 
 	return filename, err
+}
+
+func sortArrays(users []*ent.User, games []*ent.Game) {
+	sort.Slice(users, func(i, j int) bool {
+		return users[i].Name < users[j].Name
+	})
+	sort.Slice(games, func(i, j int) bool {
+		return games[i].Name < games[j].Name
+	})
+}
+
+func removeUnlended(games []*ent.Game) []*ent.Game{
+	gameNum := len(games)
+	for i := gameNum - 1; i >= 0; i-- {
+		if games[i].Cu == games[i].Ou {
+			games = remove(games, i)
+		}
+	}
+	return games
+}
+
+func remove(s []*ent.Game, i int) []*ent.Game {
+    s[i] = s[len(s)-1]
+    return s[:len(s)-1]
 }

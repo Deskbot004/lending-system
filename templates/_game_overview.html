@@ -33,7 +33,7 @@
                         <tr>
                           <th>Spielname</th>
                           <th>Spieltyp</th>
-                          <th>Original Besitzer</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -41,7 +41,10 @@
                         <tr style="transform: rotate(0);">
                           <td>{{ .Name}}</td>
                           <td>{{ .Type}}</td>
-                          <td>{{ .Ou}}</td>
+                          <td><ul>
+                            <li>Eigentümer: {{ .Ou}}</li>
+                            <li>Besitzer: {{ .Cu}}</li>
+                          </ul></td>
                         </tr>
                         {{ end}}
                       </tbody>

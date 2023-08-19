@@ -16,6 +16,7 @@
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
+                  <li class="breadcrumb-item"><a href="/game_overview">Spiele Übersicht</a></li>
                   <li class="breadcrumb-item"><a href="/game_overview/{{.User.Name}}">{{.User.Name}}</a></li>
                   <li class="breadcrumb-item active" aria-current="page">Nutzer bearbeiten</li>
                 </ol>
@@ -27,10 +28,12 @@
                 <div class="card">
                   <div class="card-body">
                       <h4 class="card-title">Informationen von {{ .User.Name }}
+                        {{ if eq .Admin "true"}}
                         &nbsp;&nbsp;
                         <a href="/deleteUser/{{.User.Name}}" class="btn btn-gradient-danger btn-rounded btn-fw btn-sm">
                           <i class="mdi mdi-delete-forever"></i>&nbsp;&nbsp;Nutzer löschen
                         </a>
+                        {{end}}
                       </h4>
                       <p class="card-description"> Bitte gebe die gewollten Daten ein</p>
                       

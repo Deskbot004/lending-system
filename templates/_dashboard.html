@@ -30,7 +30,7 @@
                 <div class="card bg-gradient-danger card-img-holder text-white">
                   <div class="card-body">
                     <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                    <h4 class="font-weight-normal mb-3">Anzahl Nutzer <i class="mdi mdi-book-multiple mdi-24px float-right"></i>
+                    <h4 class="font-weight-normal mb-3">Anzahl Nutzer <i class=" mdi mdi-account-multiple mdi-24px float-right"></i>
                     </h4>
                     <h2 class="mb-5">{{.Usernum}}</h2>
                     <h6 class="card-text">...die eingetragen sind</h6>
@@ -41,7 +41,7 @@
                 <div class="card bg-gradient-info card-img-holder text-white">
                   <div class="card-body">
                     <img src="assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
-                    <h4 class="font-weight-normal mb-3">Anzahl Spiele <i class="mdi mdi-file-tree mdi-24px float-right"></i>
+                    <h4 class="font-weight-normal mb-3">Anzahl Spiele <i class=" mdi mdi-gamepad-variant mdi-24px float-right"></i>
                     </h4>
                     <h2 class="mb-5">{{.Gamenum}}</h2>
                     <h6 class="card-text">...die eingetragen sind</h6>
@@ -69,6 +69,7 @@
               </div>
             </div>
           </div>
+          {{ if eq .Admin "true"}} <a class="btn btn-block btn-lg btn-gradient-primary mt-4" href="/db/game_db.db" download><i class="mdi mdi-database-plus"></i>&nbsp;&nbsp;Db download</a>{{end}}
           <!-- content-wrapper ends -->
           <!-- partial:/partials/_footer.html -->
           {{ template "footer.html"}}

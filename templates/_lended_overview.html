@@ -11,37 +11,27 @@
         <div class="main-panel">
           <div class="content-wrapper">
             <div class="page-header">
-              <h3 class="page-title">{{ .Username }} &nbsp;&nbsp;
-                <a href="/game_overview/{{.Username}}/edit" class="btn btn-gradient-success btn-rounded btn-fw btn-sm">
-                  <i class="mdi mdi-pencil"></i>&nbsp;&nbsp;Nutzer bearbeiten
-                </a>
-              </h3>
+              <h3 class="page-title"> Alle Ausgeliehenen Spiele</h3>
               <p class="text-danger">{{ .Error}}</p>
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/index">Dashboard</a></li>
-                  <li class="breadcrumb-item"><a href="/game_overview">Spiele Übersicht</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">{{.Username}}</li>
+                  <li class="breadcrumb-item active" aria-current="page">Ausgeliehen</li>
                 </ol>
               </nav>
             </div>
             <div class="row">
-              {{ template "all_user_table.html" .Users}}
-              <div class="col-lg-8 grid-margin stretch-card">
+              <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title">Alle Spiele von {{.Username}}&nbsp;&nbsp;
-                      <a href="/game_overview/{{.Username}}/addGame" class="btn btn-gradient-success btn-rounded btn-fw btn-sm">
-                        <i class="mdi mdi-library-plus"></i>&nbsp;&nbsp;Neues Spiel
-                      </a>
-                    </h4>
-                    <p class="card-description"> Jedes Spiel, dass der Nutzer besitzt
+                    <h4 class="card-title">Alle {{.Gamenum}} ausgeliehenen Spiele</h4>
+                    <p class="card-description"> Jedes Spiel nicht mehr beim Eigentümer
                     </p>
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>Name</th>
-                          <th>Typ</th>
+                          <th>Spielname</th>
+                          <th>Spieltyp</th>
                           <th></th>
                           <th>Notiz</th>
                           <th>Bearbeiten</th>

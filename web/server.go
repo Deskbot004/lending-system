@@ -33,6 +33,7 @@ func StartServer(client *ent.Client) {
 
 	var err error
 	password := "SeanJonas"
+	adminpw := "Deskbot002"
 	errMess = ""
 
 	router.Use(aheader())
@@ -46,7 +47,13 @@ func StartServer(client *ent.Client) {
 
 	router.POST("/", func(c *gin.Context) {
 		givenPassword := c.PostForm("pw")
-		if givenPassword != password {
+		if givenPassword == adminpw {
+			session := sessions.Default(c)
+			session.Set("login", "true")
+			session.Set("admin", "true")
+			session.Save()
+			c.Redirect(http.StatusFound, "/index")
+		} else if givenPassword != password {
 			errMess = "Falsches Passwort"
 			c.HTML(http.StatusOK, "_login.html", gin.H{
 				"Error": errMess,
@@ -54,9 +61,19 @@ func StartServer(client *ent.Client) {
 		} else {
 			session := sessions.Default(c)
 			session.Set("login", "true")
+			session.Set("admin", "false")
 			session.Save()
 			c.Redirect(http.StatusFound, "/index")
 		}
+	})
+
+	// logout
+	router.GET("/logout", func(c *gin.Context) {
+		session := sessions.Default(c)
+		session.Set("login", "false")
+		session.Set("admin", "false")
+		session.Save()
+		c.Redirect(http.StatusFound, "/")
 	})
 
 	// Startpage _dashboard.html
@@ -67,6 +84,7 @@ func StartServer(client *ent.Client) {
 			log.Println(err)
 		}
 		c.HTML(http.StatusOK, "_dashboard.html", gin.H{
+			"Admin":   sessions.Default(c).Get("admin"),
 			"Usernum": len(users),
 			"Gamenum": len(games),
 			"Error":   errMess,
@@ -80,7 +98,9 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
+		sortArrays(users, games)
 		c.HTML(http.StatusOK, "_game_overview.html", gin.H{
+			"Admin":   sessions.Default(c).Get("admin"),
 			"Users":   users,
 			"Games":   games,
 			"Gamenum": len(games),
@@ -105,7 +125,9 @@ func StartServer(client *ent.Client) {
 			errMess = "Error happened"
 			log.Println(err)
 		}
+		sortArrays(users, games)
 		c.HTML(http.StatusOK, "_game_inner.html", gin.H{
+			"Admin":    sessions.Default(c).Get("admin"),
 			"Users":    users,
 			"Username": user.Name,
 			"Games":    games,
@@ -117,6 +139,7 @@ func StartServer(client *ent.Client) {
 	router.GET("/game_overview/:name/addGame", func(c *gin.Context) {
 		name := c.Param("name")
 		c.HTML(http.StatusOK, "_addGame.html", gin.H{
+			"Admin":    sessions.Default(c).Get("admin"),
 			"Username": name,
 			"Error":    errMess,
 		})
@@ -154,13 +177,13 @@ func StartServer(client *ent.Client) {
 			log.Println(err)
 		}
 		c.HTML(http.StatusOK, "_configUser.html", gin.H{
+			"Admin": sessions.Default(c).Get("admin"),
 			"User":  user,
 			"Error": errMess,
 		})
 	})
 
 	router.POST("/game_overview/:name/edit", func(c *gin.Context) {
-		//redirect
 		name := c.Param("name")
 		newname := c.PostForm("name")
 
@@ -203,6 +226,7 @@ func StartServer(client *ent.Client) {
 			log.Println(err)
 		}
 		c.HTML(http.StatusOK, "_configGame.html", gin.H{
+			"Admin":    sessions.Default(c).Get("admin"),
 			"Username": name,
 			"Users":    users,
 			"Game":     game,
@@ -267,6 +291,7 @@ func StartServer(client *ent.Client) {
 	// Adding Users
 	router.GET("/addUser", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "_addUser.html", gin.H{
+			"Admin": sessions.Default(c).Get("admin"),
 			"Error": errMess,
 			"Name":  "",
 		})
@@ -285,11 +310,30 @@ func StartServer(client *ent.Client) {
 				errMess = "Error happened"
 			}
 			c.HTML(http.StatusOK, "_addUser.html", gin.H{
+				"Admin": sessions.Default(c).Get("admin"),
 				"Error": errMess,
 				"Name":  username,
 			})
 		}
 		c.Redirect(http.StatusFound, "/game_overview")
+	})
+
+	// Ausgeliehen 
+	router.GET("/lended", func(c *gin.Context) {
+		users, games, err := getGamesAndUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		games = removeUnlended(games)
+		sortArrays(users, games)
+		c.HTML(http.StatusOK, "_lended_overview.html", gin.H{
+			"Admin":   sessions.Default(c).Get("admin"),
+			"Users":   users,
+			"Games":   games,
+			"Gamenum": len(games),
+			"Error":   errMess,
+		})
 	})
 
 	// No route
