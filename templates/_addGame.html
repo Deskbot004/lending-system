@@ -34,7 +34,10 @@
                       <div class="form-group">
                         <label for="GameType">Typ</label>
                         <select id="GameType" class="form-control" name="gametype">
-                            <option {{if eq .Type "Switch"}}selected{{end}}>Switch</option>
+                          <option>Switch Spiel</option>
+                          <option>Sonstiges</option>
+                          <option>PC Spiel</option>
+                          <option>Verschenkbar</option>
                         </select>
                       </div>
                       <p class="text-danger">{{ .Error}}</p>

@@ -41,7 +41,10 @@
                       <div class="form-group">
                         <label for="GameType">Spieltyp</label>
                         <select id="GameType" class="form-control" name="gametype">
-                            <option {{if eq .Game.Type "Switch"}}selected{{end}}>Switch</option>
+                            <option {{if eq .Game.Type "Switch Spiel"}}selected{{end}}>Switch Spiel</option>
+                            <option {{if eq .Game.Type "Sonstiges"}}selected{{end}}>Sonstiges</option>
+                            <option {{if eq .Game.Type "PC Spiel"}}selected{{end}}>PC Spiel</option>
+                            <option {{if eq .Game.Type "Verschenkbar"}}selected{{end}}>Verschenkbar</option>
                         </select>
                       </div>
                       <p>Eigentümer: {{.Username}}</p>
