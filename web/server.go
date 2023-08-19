@@ -26,6 +26,7 @@ func StartServer(client *ent.Client) {
 	router.LoadHTMLGlob("templates/*")
 	router.Static("/assets", "./assets")
 	router.Static("/db", "./db")
+	router.Static("/tmp", "./tmp")
 	router.MaxMultipartMemory = 8 << 20
 
 	store := cookie.NewStore([]byte("secret"))
@@ -318,7 +319,7 @@ func StartServer(client *ent.Client) {
 		c.Redirect(http.StatusFound, "/game_overview")
 	})
 
-	// Ausgeliehen 
+	// Ausgeliehen
 	router.GET("/lended", func(c *gin.Context) {
 		users, games, err := getGamesAndUsers(context.Background(), client)
 		if err != nil {
@@ -334,6 +335,22 @@ func StartServer(client *ent.Client) {
 			"Gamenum": len(games),
 			"Error":   errMess,
 		})
+	})
+
+	// Backup
+	router.GET("/backup", func(c *gin.Context) {
+		users, err := sql.GetAllUsers(context.Background(), client)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		err = zipper(users)
+		if err != nil {
+			errMess = "Error happened"
+			log.Println(err)
+		}
+		c.FileAttachment("./tmp/backup.zip", "backup.zip")
+		c.Redirect(http.StatusFound, "/index")
 	})
 
 	// No route
