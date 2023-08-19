@@ -54,7 +54,6 @@ func main() {
 	}
 	*/
 	web.StartServer(client)
-	// TODO Sort by ausgeliehen
-	// TODO Jonaskopf
+	// TODO Jonaskopf usable
 	// TODO search bar for game search
 }
